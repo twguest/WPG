@@ -6,8 +6,8 @@
 #############################################################################
 
 from __future__ import print_function #Python 2.7 compatibility
-from .srwlib import *
-from .uti_plot import *
+from srwlib import *
+from uti_plot import *
 import os
 import sys
 import time
@@ -346,7 +346,7 @@ def calcME(_e_beam, _mag, _mesh, _bl, _bw=0, _sr_meth=1, _sr_prec=0.01, _sr_samp
     _mesh.eFin = ePhAvg + 0.5*rEph
     _mesh.ne = 1
 
-  sys.stdout.write('   Starting simulation of Partially-Coherent Wavefront Propagation (takes a lot of time) ... ');sys.stdout.flush()
+  sys.stdout.write('   Starting simulation of Partially-Coherent Wavefront Propagation (takes a lot of time)... ');sys.stdout.flush()
   radStokesProp = srwl_wfr_emit_prop_multi_e(_e_beam, _mag, _mesh, _sr_meth, _sr_prec, _n_elec, _n_avg, _n_save_per, 
                                              strIntPropME_OutFilePath+_fnsuf, _sr_samp_fact, _bl, _e_ph_integ=ePhInteg)
   sys.stdout.write('all done\n')

@@ -7,16 +7,9 @@ from array import *
 import traceback
 #import sys
 #import numpy as np
-try:
-    from  wpg.srw import uti_math
-except ImportError:
-    import uti_math
 
-    
-try:
-    from  wpg.srw import uti_io
-except ImportError:
-    import uti_io
+import uti_math
+import uti_io
 
 #****************************************************************************
 def _multicolumn_file_load(fname): #MR31102017

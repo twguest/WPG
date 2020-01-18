@@ -5,15 +5,15 @@
 #############################################################################
 
 from __future__ import print_function #Python 2.7 compatibility
-from .srwlib import *
-from .uti_plot import * #required for plotting
+from srwlib import *
+from uti_plot import * #required for plotting
 import time
 
 print('SRWLIB Python Example # 13:')
 print('Simulating emission and propagation of Bending Magnet Synchrotron Radiaiton wavefront through a simple beamline')
 
 #***********Data Folder and File Names
-strExDataFolderName = 'wpg/srw/data_example_13' #example data sub-folder name
+strExDataFolderName = 'data_example_13' #example data sub-folder name
 strSpecOutFileName0 = 'ex13_res_spec.dat' #file name for output SR spectrum vs photon energy data
 strIntOutFileName0 = 'ex13_res_int_se.dat' #file name for output initial single-electron SR intensity vs X and Y data
 strIntOutFileName1 = 'ex13_res_int_prop_se.dat' #file name for output propagated single-electron SR intensity vs X and Y data
@@ -161,6 +161,7 @@ srwl_uti_save_intens_ascii(arI1s, mesh1, os.path.join(os.getcwd(), strExDataFold
 arI1m = deepcopy(arI1s) #"Flat" array to take 2D multi-electron intensity data (vs X & Y)
 srwl.CalcIntFromElecField(arI1m, wfr, 6, 1, 3, mesh1.eStart, 0, 0) #Calculating multi-electron intensity vs X & Y using convolution method (assuming it to be valid!)
 srwl_uti_save_intens_ascii(arI1m, mesh1, os.path.join(os.getcwd(), strExDataFolderName, strIntOutFileName2))
+
 print('done in', round(time.time() - t0), 's')
 
 #***********Plotting the Calculation Results

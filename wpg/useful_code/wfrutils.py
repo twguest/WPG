@@ -6,33 +6,23 @@ from __future__ import unicode_literals
 
 __author__ = 'A. Buzmakov, L. Samoylova'
 
-# Import standart libraries and addnig "../wavefront" directory to python
-# search path
-import os
-import sys
-sys.path.insert(0, os.path.join('..', '..'))
-
-from wpg.srwlib import srwl
-import wpg.srwlib
-from wpg.wpg_uti_wf import propagate_wavefront
-from wpg import Wavefront, Beamline
 import time
 import numpy
 import pylab
 
+# Import standart libraries and addnig "../wavefront" directory to python
+# search path
+import os
+import sys
+sys.path.insert(0, os.path.join('..','..'))
+
+from wpg import Wavefront, Beamline
+from wpg.wpg_uti_wf import propagate_wavefront
 # from srwlib import *
+import wpg.srwlib
+from wpg.srwlib import srwl
 
 J2EV = 6.24150934e18
-
-
-def find_nearest_index(array, value):
-    array = numpy.asarray(array)
-    idx = (numpy.abs(array - value)).argmin().min()
-    return idx
-
-
-def find_nearest_value(array, value):
-    return array[find_nearest_index(array, value)]
 
 
 def print_beamline(bl):
@@ -45,14 +35,14 @@ def print_beamline(bl):
         raise ValueError(
             'Input type must be wpg.srwlib.SRWLOptC or wpg.Beamline, given: {}'.format(
                 type(bl))
-        )
+            )
 
 
 def create_numpy_array_from_rows(rows, slices=None):
     # slice size (Re, Im)
-    N = len(rows[0]) // 2
+    N = len(rows[0]) / 2
     if slices is None:
-        slices = list(range(len(rows) // N))
+        slices = list(range(len(rows) / N))
     slice_count = len(slices)
     # 3d array
     y = numpy.zeros(shape=(N, 2 * N, slice_count), dtype='float32')
@@ -90,14 +80,10 @@ def calculate_peak_pos(mwf):
     x_axis = numpy.linspace(xmin, xmax, nx)
     y_axis = numpy.linspace(ymin, ymax, ny)
     nc = numpy.where(irr == irr_max)
-#     print(irr.shape, nc, nx, ny)
-    x0 = x_axis[nc[1][0]]
-    y0 = x_axis[nc[0][0]]
-#     irr_x = irr[ny // 2, :]
-#     irr_y = irr[:, nx // 2]
-
-#     x0 = numpy.max(x_axis[numpy.where(irr_x == numpy.max(irr_x))])
-#     y0 = numpy.max(y_axis[numpy.where(irr_y == numpy.max(irr_y))])
+    irr_x = irr[ny // 2, :]
+    irr_y = irr[:, nx // 2]
+    x0 = numpy.max(x_axis[numpy.where(irr_x == numpy.max(irr_x))])
+    y0 = numpy.max(y_axis[numpy.where(irr_y == numpy.max(irr_y))])
     return [x0, y0]
 
 
@@ -123,7 +109,6 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
 
     from matplotlib.colors import hsv_to_rgb
     from wpg.useful_code.backpropagation import fit_gaussian, gaussian
-    from wpg.wpg_uti_wf import calc_pulse_energy
 
     J2eV = 6.24150934e18
     wf_intensity = wf.get_intensity(polarization='horizontal')
@@ -131,19 +116,19 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
     if wf.params.wSpace == 'R-space':
         pulse_energy = wf.get_intensity().sum(axis=0).sum(axis=0).sum(axis=0)
         energyJ = calc_pulse_energy(wf)
-        dx = (wf.params.Mesh.xMax - wf.params.Mesh.xMin) // \
+        dx = (wf.params.Mesh.xMax - wf.params.Mesh.xMin) / \
             (wf.params.Mesh.nx - 1)
-        dy = (wf.params.Mesh.yMax - wf.params.Mesh.yMin) // \
+        dy = (wf.params.Mesh.yMax - wf.params.Mesh.yMin) / \
             (wf.params.Mesh.ny - 1)
     elif wf.params.wSpace == 'Q-space':
-        dx = (wf.params.Mesh.qxMax - wf.params.Mesh.qxMin) // \
+        dx = (wf.params.Mesh.qxMax - wf.params.Mesh.qxMin) / \
             (wf.params.Mesh.nx - 1)
-        dy = (wf.params.Mesh.qyMax - wf.params.Mesh.qyMin) // \
+        dy = (wf.params.Mesh.qyMax - wf.params.Mesh.qyMin) / \
             (wf.params.Mesh.ny - 1)
     else:
         raise TypeError('wSpace should be "R-space" or "Q-space"')
 
-    dt = (wf.params.Mesh.sliceMax - wf.params.Mesh.sliceMin) // \
+    dt = (wf.params.Mesh.sliceMax - wf.params.Mesh.sliceMin) / \
         (wf.params.Mesh.nSlices - 1)
     print('dt', dt)
 
@@ -191,7 +176,7 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
     if wf.params.wDomain == 'time' and wf.params.wSpace == 'R-space':
         print('Total pulse intinsity {:.2f} [mJ]'.format(
             energyJ*1e3))
-    print('''Gaussian approximation parameters:
+    print( '''Gaussian approximation parameters:
         center_x : {0:.2f}um.\t center_y : {1:.2f}um.
         width_x  : {2:.2f}um\t width_y : {3:.2f}um.
         rsquared : {4:0.4f}.'''.format((center_x-numpy.floor(wf.params.Mesh.nx/2))*dx*1e6,
@@ -219,12 +204,12 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
                     'x'+str(numpy.floor(dx*1e6))+' $\mu m ^2$ pixel')
 
     pylab.subplot(122)
-    pylab.plot(y_axis*1e6, data[:, int(center_x)]*1e3, 'b', label='Y-cut')
+    pylab.plot(y_axis*1e6,     data[:, int(center_x)]*1e3, 'b', label='Y-cut')
     pylab.hold(True)
     pylab.plot(
         y_axis*1e6, fit_data[:, int(center_x)]*1e3, 'b:', label='Gaussian fit')
     pylab.hold(True)
-    pylab.plot(x_axis*1e6, data[int(center_y), :]*1e3,  'g', label='X-cut')
+    pylab.plot(x_axis*1e6,     data[int(center_y), :]*1e3,  'g', label='X-cut')
     pylab.hold(True)
     pylab.plot(
         x_axis*1e6, fit_data[int(center_y), :]*1e3,  'g--', label='Gaussian fit')
@@ -245,10 +230,10 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
         rsquared = fit_result['rsquared']
         fit = gaussian(height, center_x, center_y, width_x, width_y)
         fit_data = fit(*numpy.indices(data.shape))
-        # $center_x = int(wf.params.Mesh.nSlices/2); center_y = center_x
+        #$center_x = int(wf.params.Mesh.nSlices/2); center_y = center_x
 
         print('Slice number: {}'.format(sn))
-        print('''Gaussian approximation parameters:
+        print( '''Gaussian approximation parameters:
             center_x : {0:.2f}um.\t center_y : {1:.2f}um.
             width_x  : {2:.2f}um\t width_y : {3:.2f}um.
             rsquared : {4:0.4f}.'''.format((center_x-numpy.floor(wf.params.Mesh.nx/2))*dx*1e6,
@@ -310,11 +295,10 @@ def show_slices_hsv(wf, slice_numbers=None, pretitle=''):
 
         pylab.show()
 
-
-def plot_wfront(mwf, title_fig, isHlog, isVlog, i_x_min, i_y_min, orient, onePlot, bPlotPha=None, saveDir=None):
+def plot_wfront(mwf, title_fig, isHlog, isVlog, i_x_min, i_y_min, orient, onePlot, bPlotPha=None,saveDir=None):
     """
         Plot 2D wavefront (a slice).
-
+        
         :param mwf: 2D wavefront structure 
         :param title_fig: Figure title
         :param isHlog: if True, plot the horizontal cut in logarithmic scale
@@ -337,48 +321,45 @@ def plot_wfront(mwf, title_fig, isHlog, isVlog, i_x_min, i_y_min, orient, onePlo
     [xc, yc] = calculate_peak_pos(mwf)
     print('Coordinates of center, [mm]:', xc * 1e3, yc * 1e3)
     ii = mwf.get_intensity(slice_number=0, polarization='horizontal')
-    # [LS14-06-02]
-    # for 2D Gaussian the intrincic SRW GsnBeam wave field units Nph/mm^2/0.1%BW
-    # to get fluence W/mm^2
-    # (Note: coherence time for Gaussian beam duration should be specified):
-    ii = ii*mwf.params.photonEnergy/J2EV  # *1e3
+    # [LS14-06-02] 
+    # for 2D Gaussian the intrincic SRW GsnBeam wave field units Nph/mm^2/0.1%BW 
+    # to get fluence W/mm^2 
+    # (Note: coherence time for Gaussian beam duration should be specified):  
+    ii = ii*mwf.params.photonEnergy/J2EV#*1e3
     imax = numpy.max(ii)
     [nx, ny, xmin, xmax, ymin, ymax] = get_mesh(mwf)
     ph = mwf.get_phase(slice_number=0, polarization='horizontal')
-    dx = (xmax-xmin)/(nx-1)
-    dy = (ymax-ymin)/(ny-1)
+    dx = (xmax-xmin)/(nx-1); dy = (ymax-ymin)/(ny-1)
     print('stepX, stepY [um]:', dx * 1e6, dy * 1e6, '\n')
-    xa = numpy.linspace(xmin, xmax, nx)
-    ya = numpy.linspace(ymin, ymax, ny)
+    xa = numpy.linspace(xmin, xmax, nx); 
+    ya = numpy.linspace(ymin, ymax, ny); 
 
     if mwf.params.wEFieldUnit != 'arbitrary':
-        print('Total power (integrated over full range): %g [GW]' % (
-            ii.sum(axis=0).sum(axis=0)*dx*dy*1e6*1e-9))
-        print('Peak power calculated using FWHM:         %g [GW]' % (
-            imax*1e-9*1e6*2*numpy.pi*(calculate_fwhm_x(mwf)/2.35)*(calculate_fwhm_y(mwf)/2.35)))
-        print('Max irradiance: %g [GW/mm^2]' % (imax*1e-9))
+        print('Total power (integrated over full range): %g [GW]' %(ii.sum(axis=0).sum(axis=0)*dx*dy*1e6*1e-9)) 
+        print('Peak power calculated using FWHM:         %g [GW]' %(imax*1e-9*1e6*2*numpy.pi*(calculate_fwhm_x(mwf)/2.35)*(calculate_fwhm_y(mwf)/2.35)))
+        print('Max irradiance: %g [GW/mm^2]'    %(imax*1e-9)) 
         label4irradiance = 'Irradiance (W/$mm^2$)'
     else:
         ii = ii / imax
         label4irradiance = 'Irradiance (a.u.)'
-
-    pylab.figure(figsize=(21, 6))
+    
+    pylab.figure(figsize=(21,6))
     if onePlot:
         pylab.subplot(131)
     [x1, x2, y1, y2] = mwf.get_limits()
     pylab.imshow(ii, extent=[x1 * 1e3, x2 * 1e3, y1 * 1e3, y2 * 1e3])
     pylab.set_cmap('bone')
-    # pylab.set_cmap('hot')
+    #pylab.set_cmap('hot')
     pylab.axis('tight')
-    # pylab.colorbar(orientation='horizontal')
+    #pylab.colorbar(orientation='horizontal')
     pylab.xlabel('x (mm)')
     pylab.ylabel('y (mm)')
     pylab.title(title_fig)
 
-    irr_y = ii[:, find_nearest_index(xa, xc)]
-    irr_x = ii[find_nearest_index(ya, yc), :]
-    pha_y = ph[:, find_nearest_index(xa, xc)]
-    pha_x = ph[find_nearest_index(ya, yc), :]
+    irr_y = ii[:, numpy.max(numpy.where(xa == xc))]
+    irr_x = ii[numpy.max(numpy.where(ya == yc)), :]
+    pha_y = ph[:, numpy.max(numpy.where(xa == xc))]
+    pha_x = ph[numpy.max(numpy.where(ya == yc)), :]
 
     if onePlot:
         pylab.subplot(132)
@@ -388,21 +369,15 @@ def plot_wfront(mwf, title_fig, isHlog, isVlog, i_x_min, i_y_min, orient, onePlo
         #ya = ya*1e6
         pylab.semilogy(ya * 1e6, irr_y, '-vk')
         pylab.xlabel('(um)')
-        try:
-            pylab.xlim(numpy.min(ya[numpy.where(irr_y >= imax * i_y_min)])
-                       * 1e6, numpy.max(ya[numpy.where(irr_y >= imax * i_y_min)]) * 1e6)
-        except ValueError:
-            pass
+        pylab.xlim(numpy.min(ya[numpy.where(irr_y >= imax * i_y_min)])
+                   * 1e6, numpy.max(ya[numpy.where(irr_y >= imax * i_y_min)]) * 1e6)
     else:
         #ya = ya*1e3
         pylab.plot(ya * 1e3, irr_y)
         pylab.xlabel('y (mm)')
-        try:
-            pylab.xlim(numpy.min(ya[numpy.where(irr_y >= imax * i_y_min)])
-                       * 1e3, numpy.max(ya[numpy.where(irr_y >= imax * i_y_min)]) * 1e3)
-        except ValueError:
-            pass
-    pylab.ylim(0, numpy.max(ii)*1.1)
+        pylab.xlim(numpy.min(ya[numpy.where(irr_y >= imax * i_y_min)])
+                   * 1e3, numpy.max(ya[numpy.where(irr_y >= imax * i_y_min)]) * 1e3)
+    pylab.ylim(0,numpy.max(ii)*1.1)
     pylab.ylabel(label4irradiance)
     pylab.title('Vertical cut,  xc = ' + str(int(xc * 1e6)) + ' um')
     pylab.grid(True)
@@ -414,33 +389,24 @@ def plot_wfront(mwf, title_fig, isHlog, isVlog, i_x_min, i_y_min, orient, onePlo
         #xa = xa*1e6
         pylab.semilogy(xa * 1e6, irr_x, '-vr')
         pylab.xlabel('x, (um)')
-        try:
-            pylab.xlim(numpy.min(xa[numpy.where(irr_x >= imax * i_x_min)])
-                       * 1e6, numpy.max(xa[numpy.where(irr_x >= imax * i_x_min)]) * 1e6)
-        except ValueError:
-            pass
+        pylab.xlim(numpy.min(xa[numpy.where(irr_x >= imax * i_x_min)])
+                   * 1e6, numpy.max(xa[numpy.where(irr_x >= imax * i_x_min)]) * 1e6)
     else:
         #xa = xa*1e3
         pylab.plot(xa * 1e3, irr_x)
         pylab.xlabel('x (mm)')
-
-        try:
-            pylab.xlim(numpy.min(xa[numpy.where(irr_x >= imax * i_x_min)])
-                       * 1e3, numpy.max(xa[numpy.where(irr_x >= imax * i_x_min)]) * 1e3)
-        except ValueError:
-            pass
-
-    pylab.ylim(0, numpy.max(ii)*1.1)
+        pylab.xlim(numpy.min(xa[numpy.where(irr_x >= imax * i_x_min)])
+                   * 1e3, numpy.max(xa[numpy.where(irr_x >= imax * i_x_min)]) * 1e3)
+    pylab.ylim(0,numpy.max(ii)*1.1)
     pylab.ylabel(label4irradiance)
     pylab.title('Horizontal cut, yc = ' + str(int(yc * 1e6)) + ' um')
     pylab.grid(True)
-
-    if saveDir is not None:
-        epsname = "%s/%s.eps" % (saveDir,
-                                 title_fig.split("at ")[1].split(" m")[0])
+    
+    if saveDir is not None: 
+        epsname="%s/%s.eps" % (saveDir,title_fig.split("at ")[1].split(" m")[0])
         pylab.savefig(epsname)
-        # pylab.close(epsfig)
-
+        #pylab.close(epsfig)
+    
     if bPlotPha:
         pylab.figure()
         pylab.plot(ya * 1e3, pha_y, '-ok')
@@ -512,8 +478,7 @@ def calculate_fwhm_x(mwf):
     [xc, yc] = calculate_peak_pos(mwf)
     x_axis = numpy.linspace(xmin, xmax, nx)
     y_axis = numpy.linspace(ymin, ymax, ny)
-    irr_x = irr[numpy.argmin(numpy.abs(y_axis-yc)), :]
-#     irr_x = irr[numpy.max(numpy.where(y_axis == yc)), :]
+    irr_x = irr[numpy.max(numpy.where(y_axis == yc)), :]
     fwhm = 0.
     idx = numpy.where(irr_x >= irr_max / 2)
     if numpy.size(idx) > 0:
@@ -541,7 +506,7 @@ def calculate_fwhm_y(mwf):
 def propagate_run(ifname, ofname, optBL, bSaved=False):
     """
         Propagate wavefront through a beamline and save the result (optionally).
-
+        
         :param ifname: input hdf5 file name with wavefront to be propagated 
         :param ofname: output hdf5 file name
         :param optBL: beamline
@@ -562,6 +527,6 @@ def propagate_run(ifname, ofname, optBL, bSaved=False):
         print('save hdf5:', ofname + '.h5')
         mwf.store_hdf5(ofname + '.h5')
     print('done')
-    print('propagation lasted:', round(
-        (time.time() - startTime) / 6.) / 10., 'min')
+    print('propagation lasted:', round((time.time() - startTime) / 6.) / 10., 'min')
     return wfr
+

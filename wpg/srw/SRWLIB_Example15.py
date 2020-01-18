@@ -9,15 +9,15 @@ of propagation of a gaussian beam through a drift with an analytical estimation.
 # v. 0.03
 
 from __future__ import print_function
-import wpg.srw.uti_plot as uti_plot
-from .srwlib import *
-from .uti_math import matr_prod, fwhm
+import uti_plot
+from srwlib import *
+from uti_math import matr_prod, fwhm
 
 print('SRWLIB Python Example # 15:')
 print('Calculating propagation of a gaussian beam through a drift and comparison with the analytical calculation.')
 
 #************************************* Create examples directory if it does not exist
-example_folder = 'wpg/srw/data_example_15'
+example_folder = 'data_example_15'
 if not os.path.isdir(example_folder):
     os.mkdir(example_folder)
 
