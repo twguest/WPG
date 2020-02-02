@@ -1,3 +1,9 @@
+"""
+@author: twguest
+
+-test gitg
+"""
+
 import numpy as np
 
 from scipy.signal import correlate2d as correlate
