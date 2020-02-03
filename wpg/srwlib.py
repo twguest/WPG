@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function #Py 2.*/3.* com
 try:
     from . import srwlpy as srwl
 except ImportError:
+
     import srwlpy as srwl  #  Hack for read the docs
     
 from array import *

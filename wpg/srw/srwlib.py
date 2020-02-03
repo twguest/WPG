@@ -3,7 +3,7 @@
 #############################################################################
 
 from __future__ import absolute_import, division, print_function #Py 2.*/3.* compatibility
-import srwlpy as srwl
+import wpg.srwlpy as srwl
 from array import *
 from math import *
 from copy import *
