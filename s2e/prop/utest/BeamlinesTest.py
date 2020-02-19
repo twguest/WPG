@@ -32,10 +32,15 @@ import unittest
 
 
 # Import the class to test.
-sys.path.insert(0,'../../..')
+sys.path.insert(0, "../../..")
 
 
-from s2e.prop import simple_beamline, exfel_spb_day1_beamline, exfel_spb_kb_beamline, beamline_with_screen
+from s2e.prop import (
+    simple_beamline,
+    exfel_spb_day1_beamline,
+    exfel_spb_kb_beamline,
+    beamline_with_screen,
+)
 from s2e.prop import propagate_s2e
 
 from wpg import Beamline, Wavefront
@@ -69,9 +74,11 @@ class BeamlinesTest(unittest.TestCase):
         """ Tearing down a test. """
 
         for f in self.__files_to_remove:
-            if os.path.isfile(f): os.remove(f)
+            if os.path.isfile(f):
+                os.remove(f)
         for d in self.__dirs_to_remove:
-            if os.path.isdir(d): shutil.rmtree(d)
+            if os.path.isdir(d):
+                shutil.rmtree(d)
 
     def testSimpleBeamline(self):
         """ Testing the construction of a simple beamline. """
@@ -87,10 +94,12 @@ class BeamlinesTest(unittest.TestCase):
         self.__files_to_remove.append(output_file)
 
         # Propagate.
-        propagate_s2e.propagate(self.__fel_source, output_file, simple_beamline.get_beamline )
+        propagate_s2e.propagate(
+            self.__fel_source, output_file, simple_beamline.get_beamline
+        )
 
         # Check that output was generated.
-        self.assertIn( output_file, os.listdir(".") )
+        self.assertIn(output_file, os.listdir("."))
 
     def testEXFELSPBDay1Beamline(self):
         """ Testing the construction of the Day1 EUXFEL SPB-SFX beamline. """
@@ -106,10 +115,12 @@ class BeamlinesTest(unittest.TestCase):
         self.__files_to_remove.append(output_file)
 
         # Propagate.
-        propagate_s2e.propagate(self.__fel_source, output_file, exfel_spb_day1_beamline.get_beamline )
+        propagate_s2e.propagate(
+            self.__fel_source, output_file, exfel_spb_day1_beamline.get_beamline
+        )
 
         # Check that output was generated.
-        self.assertIn( output_file, os.listdir(".") )
+        self.assertIn(output_file, os.listdir("."))
 
     def testEXFELSPBKBBeamline(self):
         """ Testing the construction of the EUXFEL SPB-SFX KB beamline. """
@@ -125,74 +136,89 @@ class BeamlinesTest(unittest.TestCase):
         self.__files_to_remove.append(output_file)
 
         # Propagate.
-        propagate_s2e.propagate(self.__fel_source, output_file, exfel_spb_kb_beamline.get_beamline )
+        propagate_s2e.propagate(
+            self.__fel_source, output_file, exfel_spb_kb_beamline.get_beamline
+        )
 
         # Check that output was generated.
-        self.assertIn( output_file, os.listdir(".") )
+        self.assertIn(output_file, os.listdir("."))
 
     def testStepwise(self):
         """ Test stepwise propagation through a beamline."""
 
-        propagate_s2e.stepwise(self.__fel_source, simple_beamline.get_beamline )
+        propagate_s2e.stepwise(self.__fel_source, simple_beamline.get_beamline)
 
         # Should produce 3 files.
         for f in range(3):
             filename = "%04d.h5" % (f)
             self.__files_to_remove.append(filename)
-            self.assertIn(filename, os.listdir(os.path.dirname(os.path.abspath(__file__))))
-
+            self.assertIn(
+                filename, os.listdir(os.path.dirname(os.path.abspath(__file__)))
+            )
 
 
 def setupTestWavefront():
     """ Utility to setup a Gaussian wavefront. Geometry corresponds to SPB-SFX Day1 configuration. """
 
     ### Geometry ###
-    src_to_hom1 = 257.8 # Distance source to HOM 1 [m]
-    src_to_hom2 = 267.8 # Distance source to HOM 2 [m]
+    src_to_hom1 = 257.8  # Distance source to HOM 1 [m]
+    src_to_hom2 = 267.8  # Distance source to HOM 2 [m]
     src_to_crl = 887.8  # Distance source to CRL [m]
-    src_to_exp = 920.42 # Distance source to experiment [m]
+    src_to_exp = 920.42  # Distance source to experiment [m]
 
     # Central photon energy.
-    ekev = 8.4 # Energy [keV]
+    ekev = 8.4  # Energy [keV]
 
     # Pulse parameters.
-    qnC = 0.5               # e-bunch charge, [nC]
-    pulse_duration = 9.e-15 # [s]
-    pulseEnergy = 1.5e-3    # total pulse energy, J
+    qnC = 0.5  # e-bunch charge, [nC]
+    pulse_duration = 9.0e-15  # [s]
+    pulseEnergy = 1.5e-3  # total pulse energy, J
 
     # Coherence time
-    coh_time = 0.24e-15     # [s]
+    coh_time = 0.24e-15  # [s]
 
     # Distance to first HOM.
     z1 = src_to_hom1
 
     # Angular distribution
-    theta_fwhm = 2.124e-6 # Beam divergence        # From Patrick's raytrace.
+    theta_fwhm = 2.124e-6  # Beam divergence        # From Patrick's raytrace.
 
-    wlambda = 12.4*1e-10/ekev # wavelength [AKM]
-    w0 = wlambda/(numpy.pi*theta_fwhm) # beam waist
-    zR = (numpy.pi*w0**2)/wlambda #Rayleigh range
-    fwhm_at_zR = theta_fwhm*zR #FWHM at Rayleigh range
-    sigmaAmp = w0/(2*numpy.sqrt(numpy.log(2))) #sigma of amplitude
+    wlambda = 12.4 * 1e-10 / ekev  # wavelength [AKM]
+    w0 = wlambda / (numpy.pi * theta_fwhm)  # beam waist
+    zR = (numpy.pi * w0 ** 2) / wlambda  # Rayleigh range
+    fwhm_at_zR = theta_fwhm * zR  # FWHM at Rayleigh range
+    sigmaAmp = w0 / (2 * numpy.sqrt(numpy.log(2)))  # sigma of amplitude
 
     # Number of points in each x and y dimension.
-    np=100
+    np = 100
 
-    bSaved=False
-    dx = 10.e-6;
-    range_xy = dx*(np-1)
-    #print ('range_xy = ', range_xy)
-    nslices = 10;
+    bSaved = False
+    dx = 10.0e-6
+    range_xy = dx * (np - 1)
+    # print ('range_xy = ', range_xy)
+    nslices = 10
 
-    srwl_wf = build_gauss_wavefront(np, np, nslices, ekev, -range_xy/2, range_xy/2,
-             -range_xy/2, range_xy/2 ,coh_time/numpy.sqrt(2),
-             sigmaAmp, sigmaAmp, src_to_hom1,
-             pulseEn=pulseEnergy, pulseRange=8.)
+    srwl_wf = build_gauss_wavefront(
+        np,
+        np,
+        nslices,
+        ekev,
+        -range_xy / 2,
+        range_xy / 2,
+        -range_xy / 2,
+        range_xy / 2,
+        coh_time / numpy.sqrt(2),
+        sigmaAmp,
+        sigmaAmp,
+        src_to_hom1,
+        pulseEn=pulseEnergy,
+        pulseRange=8.0,
+    )
 
     wf = Wavefront(srwl_wf)
 
     wf.store_hdf5("source.h5")
 
-if __name__ == '__main__':
-    unittest.main()
 
+if __name__ == "__main__":
+    unittest.main()

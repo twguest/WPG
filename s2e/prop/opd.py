@@ -2,14 +2,9 @@ from wpg.useful_code.srwutils import AuxTransmAddSurfHeightProfileScaled as prof
 import numpy as np
 
 
-def defineOPD(opTrErMirr,
-              mdatafile,
-              ncol,
-              delim,
-              orient,
-              theta,
-              scale=1.,
-              stretching=1.):
+def defineOPD(
+    opTrErMirr, mdatafile, ncol, delim, orient, theta, scale=1.0, stretching=1.0
+):
     """
     Define optical path difference (OPD) from mirror profile
 

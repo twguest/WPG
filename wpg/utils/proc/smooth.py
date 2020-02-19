@@ -1,6 +1,7 @@
 import numpy
 
-def smooth(x,window_len=11,window='hanning'):
+
+def smooth(x, window_len=11, window="hanning"):
     """smooth the data using a window with requested size.
     
     This method is based on the convolution of a scaled window with the signal.
@@ -32,19 +33,16 @@ def smooth(x,window_len=11,window='hanning'):
     NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
     """
 
-
-    if window_len<3:
+    if window_len < 3:
         return x
 
-    s=numpy.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
-    #print(len(s))
-    if window == 'flat': #moving average
-        w=numpy.ones(window_len,'d')
+    s = numpy.r_[x[window_len - 1 : 0 : -1], x, x[-2 : -window_len - 1 : -1]]
+    # print(len(s))
+    if window == "flat":  # moving average
+        w = numpy.ones(window_len, "d")
     else:
-        w=eval('numpy.'+window+'(window_len)')
+        w = eval("numpy." + window + "(window_len)")
 
-    y=numpy.convolve(w/w.sum(),s,mode='valid')
-    
-    
-    return y[(window_len//2-1):-(window_len//2)]# -*- coding: utf-8 -*-
+    y = numpy.convolve(w / w.sum(), s, mode="valid")
 
+    return y[(window_len // 2 - 1) : -(window_len // 2)]  # -*- coding: utf-8 -*-

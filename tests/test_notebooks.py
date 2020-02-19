@@ -12,21 +12,39 @@ def _notebook_run(path):
     """
 
     notebook_dir = os.path.dirname(path)
-    test_ipynb = os.path.split(path)[-1] + '.test.ipynb'
+    test_ipynb = os.path.split(path)[-1] + ".test.ipynb"
 
-    args = ["jupyter", "nbconvert", "--execute", "--allow-errors",
-            "--ExecutePreprocessor.timeout=-1",
-            "--to", "notebook", '--output', test_ipynb, path]
+    args = [
+        "jupyter",
+        "nbconvert",
+        "--execute",
+        "--allow-errors",
+        "--ExecutePreprocessor.timeout=-1",
+        "--to",
+        "notebook",
+        "--output",
+        test_ipynb,
+        path,
+    ]
     subprocess.check_call(args)
 
-    args = ["jupyter", "nbconvert", "--to", "html",
-            os.path.join(notebook_dir, test_ipynb)]
+    args = [
+        "jupyter",
+        "nbconvert",
+        "--to",
+        "html",
+        os.path.join(notebook_dir, test_ipynb),
+    ]
     subprocess.check_call(args)
 
     nb = nbformat.read(path, nbformat.current_nbformat)
-    errors = [output for cell in nb.cells if "outputs" in cell
-              for output in cell["outputs"]
-              if output.output_type == "error"]
+    errors = [
+        output
+        for cell in nb.cells
+        if "outputs" in cell
+        for output in cell["outputs"]
+        if output.output_type == "error"
+    ]
     return nb, errors
 
 
@@ -36,30 +54,24 @@ def _test_notebook(path):
 
 
 def test_tutoral_intro():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_intro.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_intro.ipynb"))
 
 
 def test_tutoral_1():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_case_1.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_1.ipynb"))
 
 
 def test_tutoral_2():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_case_2.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_2.ipynb"))
 
 
 def test_tutoral_2_new():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_case_2_new.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_2_new.ipynb"))
 
 
 def test_tutoral_3():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_case_3.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_3.ipynb"))
 
 
 def test_tutoral_3_new():
-    _test_notebook(
-        os.path.join('samples', 'Tutorials', 'Tutorial_case_3_new.ipynb'))
+    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_3_new.ipynb"))

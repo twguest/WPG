@@ -6,6 +6,7 @@ This module contains base wrapper for SRWLWfr (Wavefront). It's implement numpy 
    :platform: Linux, Mac OSX, Windows
 
 .. moduleauthor:: Alexey Buzmakov <buzmakov@gmail.com>
+.. moduleauthor:: Trey Guest <twguest@students.latrobe.edu.au>
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -25,7 +26,8 @@ import wpg.glossary as glossary
 
 from wpg.utils import srw_obj2str
 
-warnings.filterwarnings('ignore', category=Warning)
+
+import imageio
 
 
 class Wavefront(object):
@@ -68,9 +70,11 @@ class Wavefront(object):
     def _allocate_srw_moments(self):
         """Allocate memory for SRW structures."""
         self._srwl_wf.arMomX = array.array(
-            str(u'd'), [0] * self.params.Mesh.nSlices * 11)
+            str("d"), [0] * self.params.Mesh.nSlices * 11
+        )
         self._srwl_wf.arMomY = array.array(
-            str(u'd'), [0] * self.params.Mesh.nSlices * 11)
+            str("d"), [0] * self.params.Mesh.nSlices * 11
+        )
 
     def _add_field(self, wf_field):
         """
@@ -82,6 +86,7 @@ class Wavefront(object):
 
         class glossary_folder(object):
             """Glossary folder. Empty class to build dictionary tree."""
+
             pass
 
         def get_value(self):
@@ -101,7 +106,7 @@ class Wavefront(object):
             return wf_field.value.__doc__
 
         if not isinstance(wf_field, glossary.RadiationField):
-            raise TypeError('wf_field must be RadiationField')
+            raise TypeError("wf_field must be RadiationField")
 
         self._wf_fields[wf_field.glossary_name] = wf_field
 
@@ -113,8 +118,11 @@ class Wavefront(object):
                 node.__dict__[key] = glossary_folder()
             node = node.__dict__[key]
 
-        setattr(node.__class__, keys_chain[-1], property(get_value,
-                                                         set_value, doc=get_doc()))
+        setattr(
+            node.__class__,
+            keys_chain[-1],
+            property(get_value, set_value, doc=get_doc()),
+        )
 
     def _to_dict(self):
         """
@@ -139,7 +147,7 @@ class Wavefront(object):
         for (key, value) in in_dict.items():
             # python3 hack
             if isinstance(key, bytes):
-                key = key.decode('utf-8')
+                key = key.decode("utf-8")
 
             if key in self._wf_fields:
                 self._wf_fields[key].value = value
@@ -194,26 +202,27 @@ class Wavefront(object):
         :return: array of intensities
         """
 
-        if polarization == 'total' or (polarization is None):
+        if polarization == "total" or (polarization is None):
             pol = 6
-        elif polarization == 'horizontal':
+        elif polarization == "horizontal":
             pol = 0
-        elif polarization == 'vertical':
+        elif polarization == "vertical":
             pol = 1
         else:
             raise ValueError(
-                'unknown polarization value, should be "total" or "horizontal" or "vertical"')
+                'unknown polarization value, should be "total" or "horizontal" or "vertical"'
+            )
 
-        res = np.zeros(self._get_total_elements(), dtype='float32')
+        res = np.zeros(self._get_total_elements(), dtype="float32")
 
-        if not res.flags['C_CONTIGUOUS']:
+        if not res.flags["C_CONTIGUOUS"]:
             res = np.ascontiguousarray(res)
 
         res = srwlib.srwl.CalcIntFromElecField(
-            res, self._srwl_wf, pol, 0, 6, self.params.photonEnergy, 0, 0)
-        res = np.array(res, dtype='float32', copy=False)
-        res.shape = (
-            self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
+            res, self._srwl_wf, pol, 0, 6, self.params.photonEnergy, 0, 0
+        )
+        res = np.array(res, dtype="float32", copy=False)
+        res.shape = (self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
         if slice_number is not None:
             res = res[:, :, slice_number]
         return res
@@ -230,23 +239,24 @@ class Wavefront(object):
         """
         # TODO: bug with freeze
 
-        if polarization == 'total' or (polarization is None):
+        if polarization == "total" or (polarization is None):
             pol = 6
             print(
                 'Attention!!! The "total" polarization behavior sometimes strange. Use "horizontal" or "vertical".'
             )
-        elif polarization == 'horizontal':
+        elif polarization == "horizontal":
             pol = 0
-        elif polarization == 'vertical':
+        elif polarization == "vertical":
             pol = 1
         else:
             raise ValueError(
-                'unknown polarization value, should be "total" or "horizontal" or "vertical"')
+                'unknown polarization value, should be "total" or "horizontal" or "vertical"'
+            )
 
-        res = np.arctan2(self.get_imag_part(slice_number=slice_number,
-                                            polarization=polarization),
-                         self.get_real_part(slice_number=slice_number,
-                                            polarization=polarization))
+        res = np.arctan2(
+            self.get_imag_part(slice_number=slice_number, polarization=polarization),
+            self.get_real_part(slice_number=slice_number, polarization=polarization),
+        )
 
         # res = array.array('f',[0]*self.get_total_elements())
         # res = srwlib.srwl.CalcIntFromElecField(res, self._srwl_wf, pol, 0, 6, self.params.photonEnergy, 0, 0.)
@@ -267,26 +277,27 @@ class Wavefront(object):
         :type slice_number: int or range
         :return: array of real parts
         """
-        if polarization == 'total' or (polarization is None):
+        if polarization == "total" or (polarization is None):
             pol = 6
-        elif polarization == 'horizontal':
+        elif polarization == "horizontal":
             pol = 0
-        elif polarization == 'vertical':
+        elif polarization == "vertical":
             pol = 1
         else:
             raise ValueError(
-                'unknown polarization value, should be "total" or "horizontal" or "vertical"')
+                'unknown polarization value, should be "total" or "horizontal" or "vertical"'
+            )
 
-        res = np.zeros(self._get_total_elements(), dtype='float32')
-        
-        if not res.flags['C_CONTIGUOUS']:
+        res = np.zeros(self._get_total_elements(), dtype="float32")
+
+        if not res.flags["C_CONTIGUOUS"]:
             res = np.ascontiguousarray(res)
-        
+
         res = srwlib.srwl.CalcIntFromElecField(
-            res, self._srwl_wf, pol, 5, 6, self.params.photonEnergy, 0, 0)
-        res = np.array(res, dtype='float32', copy=False)
-        res.shape = (
-            self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
+            res, self._srwl_wf, pol, 5, 6, self.params.photonEnergy, 0, 0
+        )
+        res = np.array(res, dtype="float32", copy=False)
+        res.shape = (self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
         if slice_number is not None:
             res = res[:, :, slice_number]
         return res
@@ -301,61 +312,63 @@ class Wavefront(object):
         :type slice_number: int or range
         :return: array of imaginary parts
         """
-        if polarization == 'total' or (polarization is None):
+        if polarization == "total" or (polarization is None):
             pol = 6
-        elif polarization == 'horizontal':
+        elif polarization == "horizontal":
             pol = 0
-        elif polarization == 'vertical':
+        elif polarization == "vertical":
             pol = 1
         else:
             raise ValueError(
-                'unknown polarization value, should be "total" or "horizontal" or "vertical"')
+                'unknown polarization value, should be "total" or "horizontal" or "vertical"'
+            )
 
-        res = np.zeros(self._get_total_elements(), dtype='float32')
-        
-        if not res.flags['C_CONTIGUOUS']:
+        res = np.zeros(self._get_total_elements(), dtype="float32")
+
+        if not res.flags["C_CONTIGUOUS"]:
             res = np.ascontiguousarray(res)
-        
+
         res = srwlib.srwl.CalcIntFromElecField(
-            res, self._srwl_wf, pol, 6, 6, self.params.photonEnergy, 0, 0)
-        res = np.array(res, dtype='float32', copy=False)
-        res.shape = (
-            self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
+            res, self._srwl_wf, pol, 6, 6, self.params.photonEnergy, 0, 0
+        )
+
+        res = np.array(res, dtype="float32", copy=False)
+        res.shape = (self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
         if slice_number is not None:
             res = res[:, :, slice_number]
         return res
 
-    def get_limits(self, axis='z'):
+    def get_limits(self, axis="z"):
         """
         Get wavefront mesh limits [xmin, xmax, ....].
 
         Used in 2D visualization tools (as pylab.imshow(wfr_data, extends=wrf.get_limits()))
 
         :params axis: 'x','y' or 'z'
-        :type axis: string
+        :type axis: stringimport array
 
         :return: list of integers
         """
         sr = self.params.Mesh
         rep = self.params.wSpace
-        if rep == 'R-space':
+        if rep == "R-space":
             print(rep)
-            if axis == 'z':
+            if axis == "z":
                 return sr.xMin, sr.xMax, sr.yMax, sr.yMin
-            elif axis == 'x':
+            elif axis == "x":
                 return sr.sliceMin, sr.sliceMax, sr.yMax, sr.yMin
-            elif axis == 'y':
+            elif axis == "y":
                 return sr.sliceMin, sr.sliceMax, sr.xMax, sr.xMin
-        elif rep == 'Q-space':
+        elif rep == "Q-space":
             print(rep)
             wl = 12.398 * 1e-10 / (self.params.photonEnergy * 1e-3)  # WaveLength
             # wv = 2.*np.pi/wl
             # #WaveVector
-            if axis == 'z':
+            if axis == "z":
                 return sr.qxMin * wl, sr.qxMax * wl, sr.qyMax * wl, sr.qyMin * wl
-            elif axis == 'x':
+            elif axis == "x":
                 return sr.sliceMin, sr.sliceMax, sr.qyMax * wl, sr.qyMin * wl
-            elif axis == 'y':
+            elif axis == "y":
                 return sr.sliceMin, sr.sliceMax, sr.qxMax * wl, sr.qxMin * wl
 
     def __str__(self):
@@ -364,19 +377,25 @@ class Wavefront(object):
 
         :return: String representation
         """
-        mesh_str = 'Mesh:\n\t\t' + \
-            '\n\t\t'.join(srw_obj2str(self.params.Mesh).split('\n')) + '\n\t'
-        radiation_str = mesh_str + \
-            '\n\t'.join(srw_obj2str(self.params).split('\n'))
+        mesh_str = (
+            "Mesh:\n\t\t"
+            + "\n\t\t".join(srw_obj2str(self.params.Mesh).split("\n"))
+            + "\n\t"
+        )
+        radiation_str = mesh_str + "\n\t".join(srw_obj2str(self.params).split("\n"))
 
-        radiation_str = 'Radiation:\n\t' + radiation_str + '\n'
+        radiation_str = "Radiation:\n\t" + radiation_str + "\n"
 
-        data_ehor = '\tarrEhor = array of shape ' + \
-            str(self.data.arrEhor.shape) + \
-            ' // the 2-nd dimension is (re,im)\n'
-        data_ever = '\tarrEver = array of shape ' + \
-            str(self.data.arrEver.shape) + \
-            ' // the 2-nd dimension is (re,im)\n'
+        data_ehor = (
+            "\tarrEhor = array of shape "
+            + str(self.data.arrEhor.shape)
+            + " // the 2-nd dimension is (re,im)\n"
+        )
+        data_ever = (
+            "\tarrEver = array of shape "
+            + str(self.data.arrEver.shape)
+            + " // the 2-nd dimension is (re,im)\n"
+        )
 
         data_str = data_ehor + data_ever
 
@@ -389,3 +408,21 @@ class Wavefront(object):
         :return: string
         """
         return srw_obj2str(self._srwl_wf)
+
+    def save_tif(self, filename):
+        imgReal = self.II[:, :, 0]
+        imageio.imwrite(filename + ".tif", imgReal)
+
+
+    def pixelsize(self):
+
+        px = (self.params.Mesh.xMax - self.params.Mesh.xMin) / self.params.Mesh.nx
+        py = (self.params.Mesh.yMax - self.params.Mesh.yMin) / self.params.Mesh.ny
+
+        return px, py
+
+    def write(self, filename):
+        output = open(filename + ".txt", "w")
+        output.write(self.__str__())
+        output.close()
+

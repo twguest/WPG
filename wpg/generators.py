@@ -2,9 +2,10 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
 # from __future__ import unicode_literals
 
-__author__ = 'A. Buzmakov'
+__author__ = "A. Buzmakov"
 
 import warnings
 from wpg import srwlib
@@ -15,8 +16,24 @@ except ImportError:
     import srwlpy  #  Hack for read the docs
 
 
-def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, sigY, d2waist, 
-                          pulseEn=None, pulseRange=None, _mx=None, _my=None):
+def build_gauss_wavefront(
+    nx,
+    ny,
+    nz,
+    ekev,
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+    tau,
+    sigX,
+    sigY,
+    d2waist,
+    pulseEn=None,
+    pulseRange=None,
+    _mx=None,
+    _my=None,
+):
     """
     Build 3D Gaussian beam.
 
@@ -40,7 +57,6 @@ def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, s
     """
     # TODO: fix comment
 
-
     GsnBm = srwlib.SRWLGsnBm()  # Gaussian Beam structure (just parameters)
     GsnBm.x = 0  # Transverse Coordinates of Gaussian Beam Center at Waist [m]
     GsnBm.y = 0
@@ -48,11 +64,11 @@ def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, s
     GsnBm.xp = 0  # Average Angles of Gaussian Beam at Waist [rad]
     GsnBm.yp = 0
 
-    GsnBm.avgPhotEn = ekev * 1.e3  # 15000. #Photon Energy [eV]
+    GsnBm.avgPhotEn = ekev * 1.0e3  # 15000. #Photon Energy [eV]
     if pulseEn is not None:
-        GsnBm.pulseEn = pulseEn 
+        GsnBm.pulseEn = pulseEn
     else:
-        GsnBm.pulseEn = 0.001 # was 1 mJ in the Tutorial exampes as well
+        GsnBm.pulseEn = 0.001  # was 1 mJ in the Tutorial exampes as well
     GsnBm.repRate = 1  # Rep. Rate [Hz] - to be corrected
     GsnBm.polar = 1  # 1- linear hoirizontal; 2 - linear vertical
     # Far field angular divergence: 14.1e-6 ./ (ekev) .^0.75
@@ -67,11 +83,11 @@ def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, s
     # fs or 12 fs ?
     GsnBm.sigT = tau
     if _mx is not None:
-        GsnBm.mx = _mx 
+        GsnBm.mx = _mx
     else:
         GsnBm.mx = 0  # Transverse Gauss-Hermite Mode Orders
     if _mx is not None:
-        GsnBm.my = _my 
+        GsnBm.my = _my
     else:
         GsnBm.my = 0
 
@@ -80,17 +96,17 @@ def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, s
     # Numbers of points vs Photon Energy (1), Horizontal and
     # Vertical Positions (dummy)
     wfr.presFT = 1  # Defining Initial Wavefront in Time Domain
-    #wfr.presFT = 0 #Defining Initial Wavefront in Frequency Domain
+    # wfr.presFT = 0 #Defining Initial Wavefront in Frequency Domain
 
     wfr.avgPhotEn = GsnBm.avgPhotEn
     if pulseRange is not None:
-        wfr.mesh.eStart = -pulseRange/2. * GsnBm.sigT  # Initial Time [s]
-        wfr.mesh.eFin   =  pulseRange/2. * GsnBm.sigT  # Final Time [s]
+        wfr.mesh.eStart = -pulseRange / 2.0 * GsnBm.sigT  # Initial Time [s]
+        wfr.mesh.eFin = pulseRange / 2.0 * GsnBm.sigT  # Final Time [s]
     else:
-        #wfr.mesh.eStart = -100 * GsnBm.sigT  # Initial Time [s]
-        #wfr.mesh.eFin = 100 * GsnBm.sigT  # Final Time [s]
-        wfr.mesh.eStart = -4. * GsnBm.sigT  # Initial Time [s]
-        wfr.mesh.eFin = 4. * GsnBm.sigT  # Final Time [s]
+        # wfr.mesh.eStart = -100 * GsnBm.sigT  # Initial Time [s]
+        # wfr.mesh.eFin = 100 * GsnBm.sigT  # Final Time [s]
+        wfr.mesh.eStart = -4.0 * GsnBm.sigT  # Initial Time [s]
+        wfr.mesh.eFin = 4.0 * GsnBm.sigT  # Final Time [s]
 
     # Longitudinal Position [m] at which Electric Field has to be calculated,
     # i.e. the position of the first optical element
@@ -109,17 +125,37 @@ def build_gauss_wavefront(nx, ny, nz, ekev, xMin, xMax, yMin, yMax, tau, sigX, s
     wfr.partBeam.partStatMom1.xp = GsnBm.xp
     wfr.partBeam.partStatMom1.yp = GsnBm.yp
 
-    sampFactNxNyForProp = -1  # 5 #sampling factor for adjusting nx, ny (effective if > 0)
+    sampFactNxNyForProp = (
+        -1
+    )  # 5 #sampling factor for adjusting nx, ny (effective if > 0)
     arPrecPar = [sampFactNxNyForProp]
-    #**********************Calculating Initial Wavefront
+    # **********************Calculating Initial Wavefront
     srwlpy.CalcElecFieldGaussian(wfr, GsnBm, arPrecPar)
 
     return wfr
 
 
-def build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d2waist,
-                             xoff=0., yoff=0., tiltX=0., tiltY=0., 
-                             pulseEn=None, pulseTau=None,repRate=None,_mx=None,_my=None):
+def build_gauss_wavefront_xy(
+    nx,
+    ny,
+    ekev,
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+    sigX,
+    sigY,
+    d2waist,
+    xoff=0.0,
+    yoff=0.0,
+    tiltX=0.0,
+    tiltY=0.0,
+    pulseEn=None,
+    pulseTau=None,
+    repRate=None,
+    _mx=None,
+    _my=None,
+):
     """
     Build 2D Gaussian beam.
     
@@ -154,33 +190,33 @@ def build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d
     GsnBm.yp = tiltY
     GsnBm.avgPhotEn = ekev * 1e3  # 5000 #Photon Energy [eV]
     if pulseEn is not None:
-        GsnBm.pulseEn = pulseEn 
+        GsnBm.pulseEn = pulseEn
     else:
         GsnBm.pulseEn = 0.001  # Energy per Pulse [J] - to be corrected
     if repRate is not None:
-        GsnBm.repRate = repRate 
+        GsnBm.repRate = repRate
     else:
         GsnBm.repRate = 1  # Rep. Rate [Hz] - to be corrected
     GsnBm.polar = 1  # 1- linear hoirizontal; 2 - linear vertical
     GsnBm.sigX = sigX  # Horiz. RMS size at Waist [m]
     GsnBm.sigY = sigY  # Vert. RMS size at Waist [m]
     if pulseTau is not None:
-        GsnBm.sigT = pulseTau 
+        GsnBm.sigT = pulseTau
     else:
         GsnBm.sigT = 0.2e-15  # should be about coherence time to get proper BW
     if _mx is not None:
-        GsnBm.mx = _mx 
+        GsnBm.mx = _mx
     else:
         GsnBm.mx = 0  # Transverse Gauss-Hermite Mode Orders
     if _mx is not None:
-        GsnBm.my = _my 
+        GsnBm.my = _my
     else:
         GsnBm.my = 0
 
     wfr = srwlib.SRWLWfr()  # Initial Electric Field Wavefront
     wfr.allocate(1, nx, ny)
-     # Numbers of points vs Photon Energy (1), Horizontal and
-     # Vertical Positions (dummy)
+    # Numbers of points vs Photon Energy (1), Horizontal and
+    # Vertical Positions (dummy)
     wfr.mesh.eStart = GsnBm.avgPhotEn  # Initial Photon Energy [eV]
     wfr.mesh.eFin = GsnBm.avgPhotEn  # Final Photon Energy [eV]
     wfr.avgPhotEn = (wfr.mesh.eStart + wfr.mesh.eFin) / 2
@@ -190,7 +226,7 @@ def build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d
     wfr.mesh.yStart = yMin  # Initial Vertical Position [m]
     wfr.mesh.yFin = yMax  # Final Vertical Position [m]
 
-    #wfr.presFT = 1  # Defining Initial Wavefront in Time Domain
+    # wfr.presFT = 1  # Defining Initial Wavefront in Time Domain
     wfr.presFT = 0  # Defining Initial Wavefront in Freq Domain
 
     # Some information about the source in the Wavefront structure
@@ -201,7 +237,7 @@ def build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d
     wfr.partBeam.partStatMom1.yp = GsnBm.yp
 
     if (pulseEn is None) and (pulseTau is None):
-        wfr.unitElFld = 0 # set to 'arbitrary'
+        wfr.unitElFld = 0  # set to 'arbitrary'
 
     sampFactNxNyForProp = -1  # sampling factor for adjusting nx, ny (effective if > 0)
     arPrecPar = [sampFactNxNyForProp]
@@ -209,9 +245,4 @@ def build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d
     return wfr
 
 
-def build_gauss_wavefront_xy_(xoff, yoff, tiltX, tiltY, nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d2waist):
-    """
-    This function depricated and will removed in next releases, use build_gauss_wavefront_xy instead. 
-    """
-    warnings.warn('This function depricated and will removed in next releases, use build_gauss_wavefront_xy instead.', DeprecationWarning)
-    return build_gauss_wavefront_xy(nx, ny, ekev, xMin, xMax, yMin, yMax, sigX, sigY, d2waist, xoff, yoff, tiltX, tiltY)
+

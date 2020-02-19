@@ -1,19 +1,22 @@
 def test_import_wpg():
     import sys
-    sys.path.insert(0, '..')
+
+    sys.path.insert(0, "..")
     import wpg
 
 
 def test_import_wpg_members():
     import sys
-    sys.path.insert(0, '..')
+
+    sys.path.insert(0, "..")
     from wpg import Wavefront, Beamline
     import wpg.beamline
     import wpg.glossary
     import wpg.generators
     import wpg.optical_elements
     import wpg.srwlib
-#     import wpg.srwlpy
+
+    #     import wpg.srwlpy
     import wpg.utils
     import wpg.wpg_uti_exfl
     import wpg.wpg_uti_oe
@@ -23,7 +26,8 @@ def test_import_wpg_members():
 def test_simple_gauusina_propagation():
     # TODO: fix propagation for coerrect results
     import sys
-    sys.path.insert(0, '..')
+
+    sys.path.insert(0, "..")
     import os
 
     import wpg
@@ -34,7 +38,7 @@ def test_simple_gauusina_propagation():
 
     import numpy as np
 
-    d2waist = 270.
+    d2waist = 270.0
     # beam parameters:
     qnC = 0.1  # [nC] e-bunch charge
     thetaOM = 3.6e-3
@@ -47,7 +51,7 @@ def test_simple_gauusina_propagation():
 
     # define limits
     xmax = theta_rms * d2waist * 3.5
-    xmin = - xmax
+    xmin = -xmax
     ymin = xmin
     ymax = xmax
     nx = 300
@@ -56,22 +60,23 @@ def test_simple_gauusina_propagation():
     tau = 0.12e-15
 
     srw_wf = build_gauss_wavefront(
-        nx, ny, nz, ekev, xmin, xmax, ymin, ymax, tau, sigX, sigX, d2waist)
+        nx, ny, nz, ekev, xmin, xmax, ymin, ymax, tau, sigX, sigX, d2waist
+    )
     wf = wpg.Wavefront(srw_wf)
     b = Beamline()
     b.append(Drift(5), Use_PP())
-    srwl.SetRepresElecField(wf._srwl_wf, 'f')
+    srwl.SetRepresElecField(wf._srwl_wf, "f")
     b.propagate(wf)
-    srwl.SetRepresElecField(wf._srwl_wf, 'c')
-    srwl.ResizeElecField(srw_wf, 'c', [0, 0.25, 1, 0.25, 1])
+    srwl.SetRepresElecField(wf._srwl_wf, "c")
+    srwl.ResizeElecField(srw_wf, "c", [0, 0.25, 1, 0.25, 1])
 
     ti = wf.get_intensity()
-    
-    out_folder = os.path.join(os.path.dirname(__file__), 'tests_data')
+
+    out_folder = os.path.join(os.path.dirname(__file__), "tests_data")
     if not os.path.exists(out_folder):
         os.mkdir(out_folder)
 
-    wf_hdf5_out_file_path = os.path.join(out_folder, 'my_gauss.h5')
+    wf_hdf5_out_file_path = os.path.join(out_folder, "my_gauss.h5")
     wf.store_hdf5(wf_hdf5_out_file_path)
 
     wf_out = wpg.Wavefront()
@@ -81,18 +86,20 @@ def test_simple_gauusina_propagation():
 
 def test_hisotry():
     import sys
-    sys.path.insert(0, '..')
+
+    sys.path.insert(0, "..")
     import os
 
     import wpg
     from wpg.generators import build_gauss_wavefront
     from wpg.beamline import Beamline
     from wpg.optical_elements import Drift, Use_PP
+
     # from wpg.srwlib import srwl
 
     import numpy as np
 
-    d2waist = 270.
+    d2waist = 270.0
     # beam parameters:
     qnC = 0.1  # [nC] e-bunch charge
     thetaOM = 3.6e-3
@@ -105,7 +112,7 @@ def test_hisotry():
 
     # define limits
     xmax = theta_rms * d2waist * 3.5
-    xmin = - xmax
+    xmin = -xmax
     ymin = xmin
     ymax = xmax
     nx = 300
@@ -114,25 +121,26 @@ def test_hisotry():
     tau = 0.12e-15
 
     srw_wf = build_gauss_wavefront(
-        nx, ny, nz, ekev, xmin, xmax, ymin, ymax, tau, sigX, sigX, d2waist)
+        nx, ny, nz, ekev, xmin, xmax, ymin, ymax, tau, sigX, sigX, d2waist
+    )
     wf = wpg.Wavefront(srw_wf)
     b = Beamline()
     # b.append(Drift(5), Use_PP())
     # b.propagate(wf)
     # srwl.ResizeElecField(srw_wf, 'c', [0, 0.25, 1, 0.25, 1])
 
-    out_folder = os.path.join(os.path.dirname(__file__), 'tests_data')
+    out_folder = os.path.join(os.path.dirname(__file__), "tests_data")
     if not os.path.exists(out_folder):
         os.mkdir(out_folder)
 
-    wf_hdf5_out_file_path = os.path.join(out_folder, 'my_gauss_history.h5')
+    wf_hdf5_out_file_path = os.path.join(out_folder, "my_gauss_history.h5")
     wf.store_hdf5(wf_hdf5_out_file_path)
 
-    wf.custom_fields['/history/params/beamline/printout'] = str(b)
+    wf.custom_fields["/history/params/beamline/printout"] = str(b)
     wf.store_hdf5(wf_hdf5_out_file_path)
 
     wf_out = wpg.Wavefront()
     wf_out.load_hdf5(wf_hdf5_out_file_path)
-    wf_out.custom_fields['/history/params/beamline/printout'] = str(b)
+    wf_out.custom_fields["/history/params/beamline/printout"] = str(b)
     wf_out.store_hdf5(wf_hdf5_out_file_path)
     return wf

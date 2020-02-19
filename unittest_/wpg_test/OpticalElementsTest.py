@@ -10,7 +10,12 @@ import unittest
 
 
 # Add sources to global namespace.
-sys.path.insert(0,os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..','..')))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..")
+    ),
+)
 
 # Import the class to test.
 from wpg import optical_elements
@@ -40,9 +45,11 @@ class EmptyTest(unittest.TestCase):
         """ Tearing down a test. """
 
         for f in self.__files_to_remove:
-            if os.path.isfile(f): os.remove(f)
+            if os.path.isfile(f):
+                os.remove(f)
         for d in self.__dirs_to_remove:
-            if os.path.isdir(d): shutil.rmtree(d)
+            if os.path.isdir(d):
+                shutil.rmtree(d)
 
     def testDefaultConstruction(self):
         """ Testing the construction of an empty element."""
@@ -53,6 +60,6 @@ class EmptyTest(unittest.TestCase):
         self.assertIsInstance(empty, optical_elements.WPGOpticalElement)
         self.assertIsInstance(empty, object)
 
-if __name__ == '__main__':
-    unittest.main()
 
+if __name__ == "__main__":
+    unittest.main()

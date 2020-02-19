@@ -6,12 +6,13 @@ import unittest
 
 
 # Import the class to test.
-sys.path.insert(0,'../../..')
+sys.path.insert(0, "../../..")
 
 
 from wpg import Wavefront
 from wpg.converters import genesis_v2
 from wpg.wpg_uti_wf import plot_intensity_map
+
 
 class ConvertersTest(unittest.TestCase):
     """
@@ -37,9 +38,11 @@ class ConvertersTest(unittest.TestCase):
         """ Tearing down a test. """
 
         for f in self.__files_to_remove:
-            if os.path.isfile(f): os.remove(f)
+            if os.path.isfile(f):
+                os.remove(f)
         for d in self.__dirs_to_remove:
-            if os.path.isdir(d): shutil.rmtree(d)
+            if os.path.isdir(d):
+                shutil.rmtree(d)
 
     def testGenesisV2(self):
         """ Testing the conversion of genesis1.3 v2 output into a wpg wavefront."""
@@ -53,6 +56,6 @@ class ConvertersTest(unittest.TestCase):
         # Plot.
         plot_intensity_map(wavefront)
 
-if __name__ == '__main__':
-    unittest.main()
 
+if __name__ == "__main__":
+    unittest.main()

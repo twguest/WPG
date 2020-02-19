@@ -23,10 +23,10 @@ from __future__ import unicode_literals
 # import srwlib as srwlib
 # warnings.resetwarnings()
 
-# fix segmentation fault using fftw from numpy mkl 
-#from . import srwlpy
+# fix segmentation fault using fftw from numpy mkl
+# from . import srwlpy
 
-# Create aliases for simple importing 
+# Create aliases for simple importing
 
 from .wavefront import Wavefront
 from .beamline import Beamline

@@ -12,7 +12,7 @@ from collections import defaultdict
 import array
 import collections
 
-__author__ = 'A. Buzmakov'
+__author__ = "A. Buzmakov"
 
 
 def store_dict_hdf5(hdf5_file_name, input_dict):
@@ -51,18 +51,23 @@ def store_dict_hdf5(hdf5_file_name, input_dict):
             try:
                 if isinstance(value, numpy.ndarray):
                     if numpy.allclose(value, 0):
-                        group.create_dataset(name, data=value, chunks=True,
-                            compression='gzip', compression_opts=1)    # compression='lzf'
+                        group.create_dataset(
+                            name,
+                            data=value,
+                            chunks=True,
+                            compression="gzip",
+                            compression_opts=1,
+                        )  # compression='lzf'
                     else:
                         if all([isinstance(a, numpy.bytes_) for a in value]):
-                            value = numpy.array([a.decode('utf-8') for a in value])
+                            value = numpy.array([a.decode("utf-8") for a in value])
                         group.create_dataset(name, data=value)
                 elif isinstance(value, str):
-                        group.create_dataset(name, data=numpy.array(value.encode('utf-8')))
+                    group.create_dataset(name, data=numpy.array(value.encode("utf-8")))
 
                 elif isinstance(value, list):
                     if all([isinstance(a, str) for a in value]):
-                        value = numpy.array([a.encode('utf-8') for a in value])
+                        value = numpy.array([a.encode("utf-8") for a in value])
                     else:
                         value = numpy.array(value)
                     group.create_dataset(name, data=numpy.array(value))
@@ -73,10 +78,14 @@ def store_dict_hdf5(hdf5_file_name, input_dict):
             except TypeError:
                 group.create_dataset(name, data=value)
             except Exception:
-                print("Error at name='{}' value='{}' group='{}'".format(name, value, group))
+                print(
+                    "Error at name='{}' value='{}' group='{}'".format(
+                        name, value, group
+                    )
+                )
                 raise
 
-    with h5py.File(hdf5_file_name, 'w') as res_file:
+    with h5py.File(hdf5_file_name, "w") as res_file:
         store_group(input_dict, res_file)
 
 
@@ -90,7 +99,7 @@ def load_dict_slash_hdf5(hdf5_file_name):
         if not isinstance(obj, h5py.Group):
             out_dict.update({name.encode(): obj.value})
 
-    with h5py.File(hdf5_file_name, 'r') as h5_file:
+    with h5py.File(hdf5_file_name, "r") as h5_file:
         h5_file.visititems(add_item)
 
     return out_dict
@@ -104,11 +113,11 @@ def update_dict_slash_string(input_dict, keys_string, value):
     :param value: value
     """
     try:
-        keys_string = keys_string.decode('utf-8')
+        keys_string = keys_string.decode("utf-8")
     except AttributeError:
         pass
 
-    keys = keys_string.split('/')
+    keys = keys_string.split("/")
     tdict = input_dict
     for k in keys[:-1]:
         if k not in tdict:
@@ -181,6 +190,7 @@ def set_value_attr(obj, keys_chain, value):
     class glossary_folder(object):
 
         """Glossary folder"""
+
         pass
 
     node = obj
@@ -199,13 +209,13 @@ def load_hdf5_tree(hdf5_file_name):
         if not isinstance(obj, h5py.Group):
             tmp = {}
             if type(obj.value) == numpy.ndarray:
-                tmp['value'] = 'array shape = {}'.format(obj.shape)
+                tmp["value"] = "array shape = {}".format(obj.shape)
             else:
-                tmp['value'] = obj.value
-            tmp['attrs'] = dict((k.encode(), v) for k, v in list(obj.attrs.items()))
+                tmp["value"] = obj.value
+            tmp["attrs"] = dict((k.encode(), v) for k, v in list(obj.attrs.items()))
             out_dict.update({name.encode(): tmp})
 
-    with h5py.File(hdf5_file_name, 'r') as h5_file:
+    with h5py.File(hdf5_file_name, "r") as h5_file:
         h5_file.visititems(add_item)
 
     return out_dict
@@ -216,46 +226,49 @@ def print_hdf5(hdf5_file_name):
     from pprint import PrettyPrinter
 
     class MyPrettyPrinter(PrettyPrinter):
-
         def format(self, *args, **kwargs):
-            repr, readable, recursive = PrettyPrinter.format(
-                self, *args, **kwargs)
+            repr, readable, recursive = PrettyPrinter.format(self, *args, **kwargs)
             if repr:
                 if repr[0] in ('"', "'"):
-                    repr = repr.decode('string_escape')
+                    repr = repr.decode("string_escape")
                 elif repr[0:2] in ("u'", 'u"'):
-                    repr = repr.decode('unicode_escape').encode(
-                        sys.stdout.encoding)
+                    repr = repr.decode("unicode_escape").encode(sys.stdout.encoding)
             return repr, readable, recursive
 
     def pprint(obj, stream=None, indent=1, width=80, depth=None):
         printer = MyPrettyPrinter(
-            stream=stream, indent=indent, width=width, depth=depth)
+            stream=stream, indent=indent, width=width, depth=depth
+        )
         printer.pprint(obj)
 
     def pformat(obj, stream=None, indent=1, width=80, depth=None):
         printer = MyPrettyPrinter(
-            stream=stream, indent=indent, width=width, depth=depth)
+            stream=stream, indent=indent, width=width, depth=depth
+        )
         return printer.pformat(obj)
 
     pprint(load_hdf5_tree(hdf5_file_name))
 
 
-def srw_obj2str(obj, start_str=''):
-    fields = [field for field in dir(obj) if not field.startswith(
-        '__') if not isinstance(getattr(obj, field), collections.Callable)]
-    res = ''
+def srw_obj2str(obj, start_str=""):
+    fields = [
+        field
+        for field in dir(obj)
+        if not field.startswith("__")
+        if not isinstance(getattr(obj, field), collections.Callable)
+    ]
+    res = ""
     for f in fields:
         val = getattr(obj, f)
-        if 'glossary_folder' in str(val):
+        if "glossary_folder" in str(val):
             continue
-        s = ''
+        s = ""
         if not isinstance(val, array.array):
-            if 'srwlib.' in str(val):
-                s = val.__doc__ + '\n' + srw_obj2str(val, start_str + '\t')
+            if "srwlib." in str(val):
+                s = val.__doc__ + "\n" + srw_obj2str(val, start_str + "\t")
             else:
                 s = str(val)
         else:
-            s = 'array of size ' + str(len(val))
-        res += '{0}{1} = {2}\n'.format(start_str, f, s)
+            s = "array of size " + str(len(val))
+        res += "{0}{1} = {2}\n".format(start_str, f, s)
     return res

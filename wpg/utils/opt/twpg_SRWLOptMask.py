@@ -9,13 +9,36 @@ import sys
 from wpg.srwlib import SRWLOptT
 from extensions.srwl_uti_smp import *
 import wpg.uti_io
+
+
 def SRWLOptMask(
-        file_path, resolution_x, resolution_y, thickness, delta, atten_len,
-        arTr=None, extTr=0, fx=1e+23, fy=1e+23,
-        xc=0, yc=0, ne=1, e_start=0, e_fin=0,
-        area=None, rotate_angle=None, rotate_reshape=None, cutoff_background_noise=None,
-        background_color=None, tile=None, shift_x=None, shift_y=None, invert=None,
-        is_save_images=False, prefix='', output_image_format=None,
+    file_path,
+    resolution_x,
+    resolution_y,
+    thickness,
+    delta,
+    atten_len,
+    arTr=None,
+    extTr=0,
+    fx=1e23,
+    fy=1e23,
+    xc=0,
+    yc=0,
+    ne=1,
+    e_start=0,
+    e_fin=0,
+    area=None,
+    rotate_angle=None,
+    rotate_reshape=None,
+    cutoff_background_noise=None,
+    background_color=None,
+    tile=None,
+    shift_x=None,
+    shift_y=None,
+    invert=None,
+    is_save_images=False,
+    prefix="",
+    output_image_format=None,
 ):
     """Setup Sample element.
     :param file_path: path to the input file (image or .npy).
@@ -62,16 +85,16 @@ def SRWLOptMask(
         "verticalCenterCoordinate": yc,
         "initialPhotonEnergy": e_start,
         "finalPhotonPnergy": e_fin,
-        'area': area,
-        'rotateAngle': rotate_angle,
-        'rotateReshape': rotate_reshape,
-        'cutoffBackgroundNoise': cutoff_background_noise,
-        'backgroundColor': background_color,
-        'tile': tile,
-        'shiftX': shift_x,
-        'shiftY': shift_y,
-        'invert': invert,
-        'outputImageFormat': output_image_format,
+        "area": area,
+        "rotateAngle": rotate_angle,
+        "rotateReshape": rotate_reshape,
+        "cutoffBackgroundNoise": cutoff_background_noise,
+        "backgroundColor": background_color,
+        "tile": tile,
+        "shiftX": shift_x,
+        "shiftY": shift_y,
+        "invert": invert,
+        "outputImageFormat": output_image_format,
     }
 
     s = SRWLUtiSmp(
@@ -97,101 +120,122 @@ def SRWLOptMask(
     rx = nx * resolution_x
     ry = ny * resolution_y
 
-    #opT = srwlib.SRWLOptT(_nx=nx, _ny=ny, _rx=rx, _ry=ry,
+    # opT = srwlib.SRWLOptT(_nx=nx, _ny=ny, _rx=rx, _ry=ry,
     #                      _arTr=arTr, _extTr=extTr, _Fx=fx, _Fy=fy,
     #                      _x=xc, _y=yc, _ne=ne, _eStart=e_start, _eFin=e_fin)
 
     data = s.data
 
-    #OC10112018
+    # OC10112018
     specPropAreDef = False
-    if(ne > 1):
-        if((isinstance(delta, list) or isinstance(delta, array)) and (isinstance(atten_len, list) or isinstance(atten_len, array))):
+    if ne > 1:
+        if (isinstance(delta, list) or isinstance(delta, array)) and (
+            isinstance(atten_len, list) or isinstance(atten_len, array)
+        ):
             lenDelta = len(delta)
-            if((lenDelta == len(atten_len)) and (lenDelta == ne)): specPropAreDef = True
-            else: raise Exception("Inconsistent spectral refractive index decrement and/or attenuation length data")
+            if (lenDelta == len(atten_len)) and (lenDelta == ne):
+                specPropAreDef = True
+            else:
+                raise Exception(
+                    "Inconsistent spectral refractive index decrement and/or attenuation length data"
+                )
 
-    #OC10112018
+    # OC10112018
     useNumPy = False
     try:
         import numpy as np
+
         useNumPy = True
     except:
-        print('NumPy can not be loaded, native Python arrays / lists will be used instead, impacting performance')
+        print(
+            "NumPy can not be loaded, native Python arrays / lists will be used instead, impacting performance"
+        )
 
-    if(useNumPy): #RC161018
-        
-        thickByLim = thickness/s.limit_value
-        nxny = nx*ny
+    if useNumPy:  # RC161018
+
+        thickByLim = thickness / s.limit_value
+        nxny = nx * ny
         miHalfThickByLimByAttenLen = None
         miThickDeltaByLim = None
 
-        if(ne <= 1):
-            miHalfThickByLimByAttenLen = -0.5*thickByLim/atten_len
-            miThickDeltaByLim = -thickByLim*delta
+        if ne <= 1:
+            miHalfThickByLimByAttenLen = -0.5 * thickByLim / atten_len
+            miThickDeltaByLim = -thickByLim * delta
 
-            #amplTransm = np.exp(-0.5 * data * thickness / (s.limit_value * atten_len))
-            amplTransm = np.exp(miHalfThickByLimByAttenLen*data)
+            # amplTransm = np.exp(-0.5 * data * thickness / (s.limit_value * atten_len))
+            amplTransm = np.exp(miHalfThickByLimByAttenLen * data)
 
-            #optPathDiff =  -1 * data * thickness * delta / s.limit_value
-            optPathDiff =  miThickDeltaByLim*data
+            # optPathDiff =  -1 * data * thickness * delta / s.limit_value
+            optPathDiff = miThickDeltaByLim * data
 
-            arTr = np.empty((2*nxny), dtype=float)
+            arTr = np.empty((2 * nxny), dtype=float)
             arTr[0::2] = np.reshape(amplTransm, nxny)
             arTr[1::2] = np.reshape(optPathDiff, nxny)
-            #opT.arTr = arTr
-            
+            # opT.arTr = arTr
+
         else:
-            two_ne = 2*ne
-            arTr = np.empty((nxny*two_ne), dtype=float)
+            two_ne = 2 * ne
+            arTr = np.empty((nxny * two_ne), dtype=float)
 
-            if(specPropAreDef == False):
-                miHalfThickByLimByAttenLen = -0.5*thickByLim/atten_len
-                miThickDeltaByLim = -thickByLim*delta
-            
+            if specPropAreDef == False:
+                miHalfThickByLimByAttenLen = -0.5 * thickByLim / atten_len
+                miThickDeltaByLim = -thickByLim * delta
+
             for ie in range(ne):
-                if(specPropAreDef):
-                    miHalfThickByLimByAttenLen = -0.5*thickByLim/atten_len[ie]
-                    miThickDeltaByLim = -thickByLim*delta[ie]
+                if specPropAreDef:
+                    miHalfThickByLimByAttenLen = -0.5 * thickByLim / atten_len[ie]
+                    miThickDeltaByLim = -thickByLim * delta[ie]
 
-                amplTransm = np.exp(miHalfThickByLimByAttenLen*data)
-                optPathDiff = miThickDeltaByLim*data
+                amplTransm = np.exp(miHalfThickByLimByAttenLen * data)
+                optPathDiff = miThickDeltaByLim * data
 
-                two_ie = 2*ie
-                arTr[two_ie::two_ne] = np.reshape(amplTransm, nxny) #to check!
-                arTr[(two_ie + 1)::two_ne] = np.reshape(optPathDiff, nxny)
+                two_ie = 2 * ie
+                arTr[two_ie::two_ne] = np.reshape(amplTransm, nxny)  # to check!
+                arTr[(two_ie + 1) :: two_ne] = np.reshape(optPathDiff, nxny)
     else:
-        #Same data alignment as for wavefront: outmost loop vs y, inmost loop vs e
-        nTot = 2*ne*nx*ny
-        arTr = array('d', [0]*nTot)
-    
-# =============================================================================
-#         offset = 0
-#         for iy in range(ny):
-#             for ix in range(nx):
-#                 #In images Y=0 corresponds from upper-left corner, in SRW it's lower-left corner:
-#                 pathInBody = thickness * data[ny - iy - 1, ix] / s.limit_value
-#             
-#                 #OC10112018
-#                 miHalfPathInBody = -0.5*pathInBody
-#             
-#                 if(specPropAreDef):
-#                     for ie in range(ne):
-#                         #opT.arTr[offset] = math.exp(-0.5 * pathInBody / atten_len)  # amplitude transmission
-#                         #opT.arTr[offset + 1] = -delta * pathInBody  # optical path difference
-#                         arTr[offset] = math.exp(miHalfPathInBody / atten_len[ie]) #amplitude transmission
-#                         arTr[offset + 1] = -delta[ie] * pathInBody #optical path difference
-#                         offset += 2
-#                 else:
-#                     for ie in range(ne):
-#                         arTr[offset] = math.exp(miHalfPathInBody / atten_len) #amplitude transmission
-#                         arTr[offset + 1] = -delta * pathInBody  #optical path difference
-#                         offset += 2
-# =============================================================================
+        # Same data alignment as for wavefront: outmost loop vs y, inmost loop vs e
+        nTot = 2 * ne * nx * ny
+        arTr = array("d", [0] * nTot)
 
-    opT = SRWLOptT(_nx=nx, _ny=ny, _rx=rx, _ry=ry,
-                          _arTr=arTr, _extTr=extTr, _Fx=fx, _Fy=fy,
-                          _x=xc, _y=yc, _ne=ne, _eStart=e_start, _eFin=e_fin)
+    # =============================================================================
+    #         offset = 0
+    #         for iy in range(ny):
+    #             for ix in range(nx):
+    #                 #In images Y=0 corresponds from upper-left corner, in SRW it's lower-left corner:
+    #                 pathInBody = thickness * data[ny - iy - 1, ix] / s.limit_value
+    #
+    #                 #OC10112018
+    #                 miHalfPathInBody = -0.5*pathInBody
+    #
+    #                 if(specPropAreDef):
+    #                     for ie in range(ne):
+    #                         #opT.arTr[offset] = math.exp(-0.5 * pathInBody / atten_len)  # amplitude transmission
+    #                         #opT.arTr[offset + 1] = -delta * pathInBody  # optical path difference
+    #                         arTr[offset] = math.exp(miHalfPathInBody / atten_len[ie]) #amplitude transmission
+    #                         arTr[offset + 1] = -delta[ie] * pathInBody #optical path difference
+    #                         offset += 2
+    #                 else:
+    #                     for ie in range(ne):
+    #                         arTr[offset] = math.exp(miHalfPathInBody / atten_len) #amplitude transmission
+    #                         arTr[offset + 1] = -delta * pathInBody  #optical path difference
+    #                         offset += 2
+    # =============================================================================
+
+    opT = SRWLOptT(
+        _nx=nx,
+        _ny=ny,
+        _rx=rx,
+        _ry=ry,
+        _arTr=arTr,
+        _extTr=extTr,
+        _Fx=fx,
+        _Fy=fy,
+        _x=xc,
+        _y=yc,
+        _ne=ne,
+        _eStart=e_start,
+        _eFin=e_fin,
+    )
 
     opT.input_parms = input_parms
 

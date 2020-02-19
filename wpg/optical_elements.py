@@ -22,6 +22,7 @@ import wpg.srwlib
 import numpy as np
 
 import sys
+
 if sys.version_info[0] == 3:
     import pickle
 else:
@@ -35,6 +36,7 @@ class WPGOpticalElement(object):
     def __init__(self):
         pass
 
+
 class Empty(WPGOpticalElement):
 
     """Optical element: Empty.
@@ -45,7 +47,7 @@ class Empty(WPGOpticalElement):
         super(Empty, self).__init__()
 
     def __str__(self):
-        return ''
+        return ""
 
     def propagate(self, wfr, propagation_parameters):
         """
@@ -54,6 +56,7 @@ class Empty(WPGOpticalElement):
         """
         beamline = wpg.srwlib.SRWLOptC([], propagation_parameters)
         srwl.PropagElecField(wfr._srwl_wf, beamline)
+
 
 class Screen(Empty):
     """
@@ -75,17 +78,19 @@ class Screen(Empty):
         # Store filename for output.
         # Handle default.
         if filename is None:
-            filename="screen.h5"
+            filename = "screen.h5"
         # Check type.
         if not isinstance(filename, (str, unicode)):
-            raise TypeError('The parameter "filename" must be str, received %s.' % (type(filename)))
+            raise TypeError(
+                'The parameter "filename" must be str, received %s.' % (type(filename))
+            )
         # Check if parent dir exists.
         filename = os.path.abspath(filename)
         if not os.path.isdir(os.path.dirname(filename)):
-            raise IOError('%s is not a directory.' % (os.path.dirname(filename)))
+            raise IOError("%s is not a directory." % (os.path.dirname(filename)))
         # Check if file exists. Don't overwrite.
         if os.path.isfile(filename):
-            raise IOError('%s already exists. Cowardly refusing to overwrite.')
+            raise IOError("%s already exists. Cowardly refusing to overwrite.")
 
         self.__filename = filename
 
@@ -100,11 +105,21 @@ class Use_PP(object):
 
     """Short version of propagation parameters. Should be used with `wpg.beamline.Beamline`"""
 
-    def __init__(self, auto_resize_before=None, auto_resize_after=None,
-                 releative_precision=None, semi_analytical_treatment=None,
-                 fft_resizing=None, zoom=None, zoom_h=None, zoom_v=None,
-                 sampling=None, sampling_h=None, sampling_v=None, srw_pp=None
-                 ):
+    def __init__(
+        self,
+        auto_resize_before=None,
+        auto_resize_after=None,
+        releative_precision=None,
+        semi_analytical_treatment=None,
+        fft_resizing=None,
+        zoom=None,
+        zoom_h=None,
+        zoom_v=None,
+        sampling=None,
+        sampling_h=None,
+        sampling_v=None,
+        srw_pp=None,
+    ):
         """
         :params srw_pp: propagation parameters in srw style
         """
@@ -295,19 +310,20 @@ class Use_PP(object):
         """
         Print propagation parameters in human readable format.
         """
-        return '\n'.join([
-            "zoom_h = {}".format(self.zoom_h),
-            "zoom_v = {}".format(self.zoom_v),
-            "sampling_h = {}".format(self.sampling_h),
-            "sampling_v = {}".format(self.sampling_v),
-            "semi_analytical_treatment = {}".format(
-                self.semi_analytical_treatment),
-            "auto_resize_before = {}".format(self.auto_resize_before),
-            "auto_resize_after = {}".format(self.auto_resize_after),
-            "releative_precision = {}".format(self.releative_precision),
-            "fft_resizing = {}".format(self.fft_resizing),
-            '\n'
-        ])
+        return "\n".join(
+            [
+                "zoom_h = {}".format(self.zoom_h),
+                "zoom_v = {}".format(self.zoom_v),
+                "sampling_h = {}".format(self.sampling_h),
+                "sampling_v = {}".format(self.sampling_v),
+                "semi_analytical_treatment = {}".format(self.semi_analytical_treatment),
+                "auto_resize_before = {}".format(self.auto_resize_before),
+                "auto_resize_after = {}".format(self.auto_resize_after),
+                "releative_precision = {}".format(self.releative_precision),
+                "fft_resizing = {}".format(self.fft_resizing),
+                "\n",
+            ]
+        )
 
 
 def Aperture(shape, ap_or_ob, Dx, Dy=1e23, x=0, y=0):
@@ -326,7 +342,9 @@ def Aperture(shape, ap_or_ob, Dx, Dy=1e23, x=0, y=0):
     return opAp
 
 
-def Mirror_elliptical(orient, p, q, thetaE, theta0, length, roll=0., yaw=0., distance=0.):
+def Mirror_elliptical(
+    orient, p, q, thetaE, theta0, length, roll=0.0, yaw=0.0, distance=0.0
+):
     """
     Defining a plane elliptical focusing mirror propagator: A wrapper to a SRWL function SRWLOptMirEl() 
 
@@ -342,19 +360,42 @@ def Mirror_elliptical(orient, p, q, thetaE, theta0, length, roll=0., yaw=0., dis
     """
     from wpg.srwlib import SRWLOptMirEl
 
-    if orient == 'x':  # horizontal plane ellipsoidal mirror
-        opEFM = SRWLOptMirEl(_p=p, _q=q, _ang_graz=thetaE, 
-                             _r_sag=1.e+40, _size_tang=length,
-                             _nvx=np.cos(theta0), _nvy=np.sin(roll), _nvz=-np.sin(theta0),
-                             _tvx=-np.sin(theta0), _tvy=0, _x=np.tan(yaw)*distance, _y=0, _treat_in_out=1)
-    elif orient == 'y':  # vertical plane ellipsoidal mirror
-        opEFM = SRWLOptMirEl(_p=p, _q=q, _ang_graz=thetaE,
-                             _r_sag=1.e+40, _size_tang=length,
-                             _nvx=np.sin(roll), _nvy=np.cos(theta0), _nvz=-np.sin(theta0),
-                             _tvx=0, _tvy=-np.sin(theta0), _x=0, _y=np.tan(yaw)*distance, _treat_in_out=1)
+    if orient == "x":  # horizontal plane ellipsoidal mirror
+        opEFM = SRWLOptMirEl(
+            _p=p,
+            _q=q,
+            _ang_graz=thetaE,
+            _r_sag=1.0e40,
+            _size_tang=length,
+            _nvx=np.cos(theta0),
+            _nvy=np.sin(roll),
+            _nvz=-np.sin(theta0),
+            _tvx=-np.sin(theta0),
+            _tvy=0,
+            _x=np.tan(yaw) * distance,
+            _y=0,
+            _treat_in_out=1,
+        )
+    elif orient == "y":  # vertical plane ellipsoidal mirror
+        opEFM = SRWLOptMirEl(
+            _p=p,
+            _q=q,
+            _ang_graz=thetaE,
+            _r_sag=1.0e40,
+            _size_tang=length,
+            _nvx=np.sin(roll),
+            _nvy=np.cos(theta0),
+            _nvz=-np.sin(theta0),
+            _tvx=0,
+            _tvy=-np.sin(theta0),
+            _x=0,
+            _y=np.tan(yaw) * distance,
+            _treat_in_out=1,
+        )
     else:
         raise TypeError('orient should be "x" or "y"')
     return opEFM
+
 
 def WF_dist(nx, ny, Dx, Dy):
     """
@@ -366,10 +407,22 @@ def WF_dist(nx, ny, Dx, Dy):
     :param Dy: size in
     """
     from wpg.srwlib import SRWLOptT
+
     return SRWLOptT(nx, ny, Dx, Dy)
 
 
-def Mirror_plane(orient, theta, length, range_xy, filename, scale=1, delim=' ', xscale = 1, x0 = 0., bPlot=False):
+def Mirror_plane(
+    orient,
+    theta,
+    length,
+    range_xy,
+    filename,
+    scale=1,
+    delim=" ",
+    xscale=1,
+    x0=0.0,
+    bPlot=False,
+):
     """
     Defining a plane mirror propagator with taking into account surface height errors
 
@@ -384,20 +437,42 @@ def Mirror_plane(orient, theta, length, range_xy, filename, scale=1, delim=' ', 
     :param x0: shift of mirror longitudinal position [m]
     :return: opIPM  - imperfect plane mirror propagator
     """
-    if orient == 'x':  # horizontal plane mirror
-        opIPM = WF_dist(1500, 100, length*theta, range_xy)
-    elif orient == 'y':  # vertical plane mirror
-        opIPM = WF_dist(100, 1500, range_xy, length*theta)
+    if orient == "x":  # horizontal plane mirror
+        opIPM = WF_dist(1500, 100, length * theta, range_xy)
+    elif orient == "y":  # vertical plane mirror
+        opIPM = WF_dist(100, 1500, range_xy, length * theta)
     else:
         raise TypeError('orient should be "x" or "y"')
 
-    calculateOPD(opIPM, mdatafile=filename, ncol=2, delim=delim,
-                 Orient=orient, theta=theta, scale=scale,
-                 length = length, xscale = xscale, x0=x0, bPlot=bPlot)
+    calculateOPD(
+        opIPM,
+        mdatafile=filename,
+        ncol=2,
+        delim=delim,
+        Orient=orient,
+        theta=theta,
+        scale=scale,
+        length=length,
+        xscale=xscale,
+        x0=x0,
+        bPlot=bPlot,
+    )
     return opIPM
 
 
-def Mirror_plane_2d(orient, theta, length, range_xy, filename, scale=1, x0=0., y0=0., xscale=1., yscale=1.,bPlot=False):
+def Mirror_plane_2d(
+    orient,
+    theta,
+    length,
+    range_xy,
+    filename,
+    scale=1,
+    x0=0.0,
+    y0=0.0,
+    xscale=1.0,
+    yscale=1.0,
+    bPlot=False,
+):
     """
     Defining a plane mirror propagator with taking into account 2D surface height errors
 
@@ -422,17 +497,17 @@ def Mirror_plane_2d(orient, theta, length, range_xy, filename, scale=1, x0=0., y
     dim = np.shape(_height_prof_data)
     ntotal = dim[0]
     nx = np.size(np.where(_height_prof_data[:, 1] == _height_prof_data[0, 1]))
-    ny = int(ntotal/nx)
-    print('nx,ny:', nx, ny)
+    ny = int(ntotal / nx)
+    print("nx,ny:", nx, ny)
 
-    xax = _height_prof_data[0:nx, 0]*xscale
+    xax = _height_prof_data[0:nx, 0] * xscale
     xmin = min(xax)
     xmax = max(xax)
-    xc = (xmin+xmax)/2
-    yax = _height_prof_data[0:ntotal:nx, 1]*yscale
+    xc = (xmin + xmax) / 2
+    yax = _height_prof_data[0:ntotal:nx, 1] * yscale
     ymin = min(yax)
     ymax = max(yax)
-    yc = (ymin+ymax)/2
+    yc = (ymin + ymax) / 2
     xax = xax - x0 - xc
     xmin = min(xax)
     xmax = max(xax)
@@ -440,32 +515,37 @@ def Mirror_plane_2d(orient, theta, length, range_xy, filename, scale=1, x0=0., y
     ymin = min(yax)
     ymax = max(yax)
 
-    print('length: {:.1f} mm, width: {:.1f} mm'.format(
-        (xmax-xmin)*1e3, (ymax-ymin)*1e3))
-    if (xmin <= -length/2.) and (xmax >= length/2):
-        xmin = -length/2
-        xmax = length/2
-    else:
-        raise ValueError(
-            'specified length -{0:.0f}:{0:.0f} mm exceeds \'{1:s}\' mirror limits {2:.0f}:{3:.0f} mm'.format(
-                length*1e3/2, os.path.basename(filename), xmin*1e3, xmax*1e3)
+    print(
+        "length: {:.1f} mm, width: {:.1f} mm".format(
+            (xmax - xmin) * 1e3, (ymax - ymin) * 1e3
         )
-    if (ymin <= -range_xy/2) and (ymax >= range_xy/2):
-        ymin = -range_xy/2
-        ymax = range_xy/2
+    )
+    if (xmin <= -length / 2.0) and (xmax >= length / 2):
+        xmin = -length / 2
+        xmax = length / 2
     else:
         raise ValueError(
-            'specified width -{0:.0f}:{0:.0f} mm exceeds \'{1:s}\' mirror limits {2:.0f}:{3:.0f} mm'.format(
-                range_xy*1e3/2, os.path.basename(filename), ymin*1e3, ymax*1e3)
+            "specified length -{0:.0f}:{0:.0f} mm exceeds '{1:s}' mirror limits {2:.0f}:{3:.0f} mm".format(
+                length * 1e3 / 2, os.path.basename(filename), xmin * 1e3, xmax * 1e3
+            )
+        )
+    if (ymin <= -range_xy / 2) and (ymax >= range_xy / 2):
+        ymin = -range_xy / 2
+        ymax = range_xy / 2
+    else:
+        raise ValueError(
+            "specified width -{0:.0f}:{0:.0f} mm exceeds '{1:s}' mirror limits {2:.0f}:{3:.0f} mm".format(
+                range_xy * 1e3 / 2, os.path.basename(filename), ymin * 1e3, ymax * 1e3
+            )
         )
 
     # plt.figure();plt.plot(xax,'bx');plt.plot(yax,'ro');plt.title('xax(blue) yax(red)');
     _height_prof_data_val = np.reshape(_height_prof_data[:, 2], (ny, nx))
     # plt.figure();plt.imshow(_height_prof_data_val);plt.colorbar(orientation='horizontal')
-    if orient == 'y':
-        opIPM = SRWLOptT(100, 1500, (ymax-ymin), (xmax-xmin)*sinTheta)
-    elif orient == 'x':
-        opIPM = SRWLOptT(1500, 100, (xmax-xmin)*sinTheta, (ymax-ymin))
+    if orient == "y":
+        opIPM = SRWLOptT(100, 1500, (ymax - ymin), (xmax - xmin) * sinTheta)
+    elif orient == "x":
+        opIPM = SRWLOptT(1500, 100, (xmax - xmin) * sinTheta, (ymax - ymin))
     else:
         raise TypeError('orient should be "x" or "y"')
     xnew, ynew = np.mgrid[xmin:xmax:1500j, ymin:ymax:100j]
@@ -473,33 +553,39 @@ def Mirror_plane_2d(orient, theta, length, range_xy, filename, scale=1, x0=0., y
     h_new = f(xnew[:, 0], ynew[0, :])
     if bPlot:
         import pylab as plt
-        plt.figure();plt.pcolor(xnew, ynew, h_new*scale*1e9);
+
+        plt.figure()
+        plt.pcolor(xnew, ynew, h_new * scale * 1e9)
         plt.axis([xnew.min(), xnew.max(), ynew.min(), ynew.max()])
-        plt.colorbar(orientation='horizontal');
-        plt.title('surface height errors map, nm');plt.show()
+        plt.colorbar(orientation="horizontal")
+        plt.title("surface height errors map, nm")
+        plt.show()
     # print('len:',len(_height_prof_data[2,:]))
 
     auxMesh = opIPM.mesh
     from array import array
-    foo = array(str(u'd'), [])
+
+    foo = array(str("d"), [])
     # for i in range(150000):
     #     foo.append(1.)
-    foo = array(str(u'd'), [1.]*150000)
+    foo = array(str("d"), [1.0] * 150000)
     opIPM.arTr[::2] = foo  # Amplitude Transmission
-    foo = array(str(u'd'), [])
-    if orient == 'y':
+    foo = array(str("d"), [])
+    if orient == "y":
         for ix in range(1500):
             for iy in range(100):
                 foo.append(-2 * sinTheta * h_new[ix, iy] * scale)
-    elif orient == 'x':
+    elif orient == "x":
         for iy in range(100):
             for ix in range(1500):
                 foo.append(-2 * sinTheta * h_new[ix, iy] * scale)
-    opIPM.arTr[1::2] = foo    # Optical Path Difference (to check sign!)
+    opIPM.arTr[1::2] = foo  # Optical Path Difference (to check sign!)
     return opIPM
 
 
-def VLS_grating(_mirSub, _m=1, _grDen=100, _grDen1=0, _grDen2=0, _grDen3=0, _grDen4=0, _grAng=0):
+def VLS_grating(
+    _mirSub, _m=1, _grDen=100, _grDen1=0, _grDen2=0, _grDen3=0, _grDen4=0, _grAng=0
+):
     """
     Optical Element: Grating.
 
@@ -515,6 +601,7 @@ def VLS_grating(_mirSub, _m=1, _grDen=100, _grDen1=0, _grDen2=0, _grDen3=0, _grD
     """
 
     from .srwlib import SRWLOptG
+
     return SRWLOptG(_mirSub, _m, _grDen, _grDen1, _grDen2, _grDen3, _grDen4, _grAng)
 
 
@@ -663,9 +750,24 @@ def VLS_grating(_mirSub, _m=1, _grDen=100, _grDen1=0, _grDen2=0, _grDen3=0, _grD
 #         xtal, h=_h, k=_k, l=_l, tc=tc, _dE=_dE, doPrint=False)
 
 
-def CRL(_foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
-        _wall_thick, _xc, _yc, _void_cen_rad=None,
-        _e_start=0, _e_fin=0, _nx=1001, _ny=1001):
+def CRL(
+    _foc_plane,
+    _delta,
+    _atten_len,
+    _shape,
+    _apert_h,
+    _apert_v,
+    _r_min,
+    _n,
+    _wall_thick,
+    _xc,
+    _yc,
+    _void_cen_rad=None,
+    _e_start=0,
+    _e_fin=0,
+    _nx=1001,
+    _ny=1001,
+):
     """
     Setup Transmission type Optical Element which simulates Compound Refractive Lens (CRL).
 
@@ -686,12 +788,39 @@ def CRL(_foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
     :return: transmission (SRWLOptT) type optical element which simulates CRL
     """
 
-    return srwl_opt_setup_CRL(_foc_plane, _delta, _atten_len, _shape,
-                              _apert_h, _apert_v, _r_min, _n, _wall_thick,
-                              _xc, _yc, _void_cen_rad, _e_start, _e_fin, _nx, _ny)
+    return srwl_opt_setup_CRL(
+        _foc_plane,
+        _delta,
+        _atten_len,
+        _shape,
+        _apert_h,
+        _apert_v,
+        _r_min,
+        _n,
+        _wall_thick,
+        _xc,
+        _yc,
+        _void_cen_rad,
+        _e_start,
+        _e_fin,
+        _nx,
+        _ny,
+    )
 
 
-def calculateOPD(wf_dist, mdatafile, ncol, delim, Orient, theta, scale=1., length=1., xscale=1., x0=0., bPlot=False):
+def calculateOPD(
+    wf_dist,
+    mdatafile,
+    ncol,
+    delim,
+    Orient,
+    theta,
+    scale=1.0,
+    length=1.0,
+    xscale=1.0,
+    x0=0.0,
+    bPlot=False,
+):
     """
     Calculates optical path difference (OPD) from mirror profile and
     fills the struct wf_dist (``struct SRWLOptT``) for wavefront distortions
@@ -709,6 +838,7 @@ def calculateOPD(wf_dist, mdatafile, ncol, delim, Orient, theta, scale=1., lengt
     :return: filled ``struct SRWLOptT``
     """
     from numpy import loadtxt
+
     # import SRW helpers functions
     from wpg.useful_code.srwutils import AuxTransmAddSurfHeightProfileScaled
 
@@ -717,14 +847,15 @@ def calculateOPD(wf_dist, mdatafile, ncol, delim, Orient, theta, scale=1., lengt
 
     if bPlot:
         import pylab as plt
+
         plt.figure()
-        plt.plot(heightProfData[0, :]*1e3, heightProfData[1, :]*scale*1.e9)
-        plt.xlim([(-length+x0)*0.5e3,(length-x0)*0.5e3])
-        plt.xlabel('mm'); plt.ylabel('nm')
-        plt.title('Height error profile {:s}'.format(mdatafile))
+        plt.plot(heightProfData[0, :] * 1e3, heightProfData[1, :] * scale * 1.0e9)
+        plt.xlim([(-length + x0) * 0.5e3, (length - x0) * 0.5e3])
+        plt.xlabel("mm")
+        plt.ylabel("nm")
+        plt.title("Height error profile {:s}".format(mdatafile))
         plt.show()
-    AuxTransmAddSurfHeightProfileScaled(
-        wf_dist, heightProfData, Orient, theta, scale)
+    AuxTransmAddSurfHeightProfileScaled(wf_dist, heightProfData, Orient, theta, scale)
     return wf_dist
 
 
@@ -735,7 +866,7 @@ def _save_object(obj, file_name):
     :param: obj : - python objest to be saved
     :param: file_name : - output file, wil be overwrite if exists
     """
-    with open(file_name, 'wb') as f:
+    with open(file_name, "wb") as f:
         pickle.dump(obj, f)
 
 
@@ -747,7 +878,7 @@ def _load_object(file_name):
     :return: obj : - loaded pthon object
     """
     res = None
-    with open(file_name, 'rb') as f:
+    with open(file_name, "rb") as f:
         res = pickle.load(f)
 
     return res
@@ -768,10 +899,26 @@ def mkdir_p(path):
             raise
 
 
-def create_CRL(directory, voids_params,
-               _foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
-               _wall_thick, _xc, _yc, _void_cen_rad=None,
-               _e_start=0, _e_fin=0, _nx=1001, _ny=1001):
+def create_CRL(
+    directory,
+    voids_params,
+    _foc_plane,
+    _delta,
+    _atten_len,
+    _shape,
+    _apert_h,
+    _apert_v,
+    _r_min,
+    _n,
+    _wall_thick,
+    _xc,
+    _yc,
+    _void_cen_rad=None,
+    _e_start=0,
+    _e_fin=0,
+    _nx=1001,
+    _ny=1001,
+):
     """
     This function build CLR or load it from file if it was created beforehand.
     Out/input filename builded as sequence of function parameters.
@@ -797,34 +944,68 @@ def create_CRL(directory, voids_params,
     :return: SRWL CRL object
     """
     if not isinstance(voids_params, tuple):
-        raise TypeError('Voids_params must be tuple')
+        raise TypeError("Voids_params must be tuple")
 
-    file_name = '_'.join([str(a) for a in args[:-1]])
-    subdir_name = '_'.join([str(v) for v in voids_params])
+    file_name = "_".join([str(a) for a in args[:-1]])
+    subdir_name = "_".join([str(v) for v in voids_params])
     if directory is None:
-        full_path = os.path.join(subdir_name, file_name + '.pkl')
+        full_path = os.path.join(subdir_name, file_name + ".pkl")
     else:
-        full_path = os.path.join(directory, subdir_name, file_name + '.pkl')
+        full_path = os.path.join(directory, subdir_name, file_name + ".pkl")
 
     if os.path.isfile(full_path):
-        print('Found file {}. CLR will be loaded from file'.format(full_path))
+        print("Found file {}. CLR will be loaded from file".format(full_path))
         res = _load_object(full_path)
         return res
     else:
-        print('CLR file NOT found. CLR will be recalculated and saved in file {}'.format(
-            full_path))
-        res = CRL(_foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
-                  _wall_thick, _xc, _yc, _void_cen_rad,
-                  _e_start, _e_fin, _nx, _ny)
+        print(
+            "CLR file NOT found. CLR will be recalculated and saved in file {}".format(
+                full_path
+            )
+        )
+        res = CRL(
+            _foc_plane,
+            _delta,
+            _atten_len,
+            _shape,
+            _apert_h,
+            _apert_v,
+            _r_min,
+            _n,
+            _wall_thick,
+            _xc,
+            _yc,
+            _void_cen_rad,
+            _e_start,
+            _e_fin,
+            _nx,
+            _ny,
+        )
         mkdir_p(os.path.dirname(full_path))
         _save_object(res, full_path)
         return res
 
 
-def create_CRL_from_file(directory, file_name,
-                         _foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
-                         _wall_thick, _xc, _yc, _void_cen_rad=None,
-                         _e_start=0, _e_fin=0, _nx=1001, _ny=1001):
+def create_CRL_from_file(
+    directory,
+    file_name,
+    _foc_plane,
+    _delta,
+    _atten_len,
+    _shape,
+    _apert_h,
+    _apert_v,
+    _r_min,
+    _n,
+    _wall_thick,
+    _xc,
+    _yc,
+    _void_cen_rad=None,
+    _e_start=0,
+    _e_fin=0,
+    _nx=1001,
+    _ny=1001,
+):
     """
     This function build CLR or load it from file.
     Out/input filename builded as sequence of function parameters.
@@ -849,18 +1030,36 @@ def create_CRL_from_file(directory, file_name,
     :return: SRWL CRL object
     """
 
-    full_path = os.path.join(directory, file_name + '.pkl')
+    full_path = os.path.join(directory, file_name + ".pkl")
 
     if os.path.isfile(full_path):
-        print('Found file {}. CLR will be loaded from file'.format(full_path))
+        print("Found file {}. CLR will be loaded from file".format(full_path))
         res = _load_object(full_path)
         return res
     else:
-        print('CLR file NOT found. CLR will be recalculated and saved in file {}'.format(
-            full_path))
-        res = CRL(_foc_plane, _delta, _atten_len, _shape, _apert_h, _apert_v, _r_min, _n,
-                  _wall_thick, _xc, _yc, _void_cen_rad,
-                  _e_start, _e_fin, _nx, _ny)
+        print(
+            "CLR file NOT found. CLR will be recalculated and saved in file {}".format(
+                full_path
+            )
+        )
+        res = CRL(
+            _foc_plane,
+            _delta,
+            _atten_len,
+            _shape,
+            _apert_h,
+            _apert_v,
+            _r_min,
+            _n,
+            _wall_thick,
+            _xc,
+            _yc,
+            _void_cen_rad,
+            _e_start,
+            _e_fin,
+            _nx,
+            _ny,
+        )
         mkdir_p(os.path.dirname(full_path))
         _save_object(res, full_path)
         return res
