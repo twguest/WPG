@@ -4,6 +4,7 @@
 test-class
 """
 
-import wpg.beamline
-from wpg.srwlib import SRWLOptA as aperture
-from wpg.srwlib import SRWLOptD as drift
+import wpg.coherence
+import wpg.multi_electron
+import wpg.gvrutils
+import wpg.twpg_optmask
