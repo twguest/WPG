@@ -1339,7 +1339,7 @@ def print_glossary_html():
 #                 'wFloatType': GlossaryField(type='string',
 #                         limits=('Float', 'Double'), alias='numTypeElFld', description=r'electric field numerical type'
 #                         ),
-#                 'wEFieldUnit ': GlossaryField(type='string',
+#                 'wEFieldUnit ': GlossaryField(type='string',
 #                         limits=('sqrt(GW)',
 #                         'sqrt(Nphoton/s/0.1%bw/mm^2)', 'sqrt(Nphotons)'
 #                         ), alias='unitElFld',

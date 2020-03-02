@@ -7,8 +7,8 @@ from array import *
 from math import *
 from copy import *
 
-from extensions.twpg_wavefront import Wavefront
-from extensions.run.metrology_bl import sxri_bl
+from wpg.wavefront import Wavefront
+from wpg.run.metrology_bl import sxri_bl
 
 from wpg.srwlib import SRWLRadMesh as Mesh
 from joblib import load
