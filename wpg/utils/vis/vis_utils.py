@@ -183,7 +183,10 @@ def plot3d(wfr, nplots=1):
     ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    
+    import os
 
+    os.path.join(".")
     ax.xaxis._axinfo["grid"]["color"] = (1, 1, 1, 0)
     ax.yaxis._axinfo["grid"]["color"] = (1, 1, 1, 0)
     # ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)

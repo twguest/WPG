@@ -242,7 +242,6 @@ def build_gauss_wavefront_xy(
     sampFactNxNyForProp = -1  # sampling factor for adjusting nx, ny (effective if > 0)
     arPrecPar = [sampFactNxNyForProp]
     srwlpy.CalcElecFieldGaussian(wfr, GsnBm, arPrecPar)
+    
+ 
     return wfr
-
-
-

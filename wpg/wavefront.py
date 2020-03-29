@@ -336,7 +336,7 @@ class Wavefront(object):
         res.shape = (self.params.Mesh.ny, self.params.Mesh.nx, self.params.Mesh.nSlices)
         if slice_number is not None:
             res = res[:, :, slice_number]
-        return res
+        return res  
 
     def get_limits(self, axis="z"):
         """
@@ -425,4 +425,31 @@ class Wavefront(object):
         output = open(filename + ".txt", "w")
         output.write(self.__str__())
         output.close()
-
+        
+    def toComplex(self, ignoreVer = True, ignoreHor = False):
+        """
+        Convert electric field data to complex representation]
+        
+        returns [Ehor, Ever]
+        """
+        
+        for slc in range(self.params.nSlices):
+            
+                       
+            if slc == 0:
+                
+                Ehor = self.data.arrEhor[:,:,slc,0].astype('complex128')+(self.data.arrEhor[:,:,slc,1]*1j)
+                Ehor = Ehor.reshape((*self.data.arrEhor.shape[0:2], 1))
+                
+                Ever = self.data.arrEver[:,:,slc,0].astype('complex128')+(self.data.arrEver[:,:,slc,1]*1j)
+                Ever = Ever.reshape((*self.data.arrEver.shape[0:2], 1))
+            else:
+                Etmp = (self.data.arrEhor[:,:,slc,0].astype('complex128')+(self.data.arrEhor[:,:,slc,1]*1j)).reshape((*self.data.arrEhor.shape[0:2], 1))
+                Ehor = np.concatenate((Ehor, Etmp), axis = 2)
+                
+                Etmp = (self.data.arrEver[:,:,slc,0].astype('complex128')+(self.data.arrEver[:,:,slc,1]*1j)).reshape((*self.data.arrEver.shape[0:2], 1))
+                Ever = np.concatenate((Ever, Etmp), axis = 2)
+                
+        Ehor.imag, Ever.imag = np.angle(Ehor), np.angle(Ever)
+        
+        return np.array([Ehor, Ever])
