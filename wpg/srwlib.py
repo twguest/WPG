@@ -7482,6 +7482,8 @@ def srwl_opt_setup_surf_height_2d(
     _ny=0,
     _size_x=0,
     _size_y=0,
+    _x = 0,
+    _y = 0
 ):
     """
     Setup Transmission type optical element with 2D (mirror or grating) surface Heght Profile data
@@ -7579,7 +7581,7 @@ def srwl_opt_setup_surf_height_2d(
     # print(sizeLongProj, sizeTr)
     # print(sizeX, sizeY)
 
-    optSlopeErr = SRWLOptT(nx, ny, sizeX, sizeY)
+    optSlopeErr = SRWLOptT(nx, ny, sizeX, sizeY, _x = _x, _y = _y)
 
     auxMesh = optSlopeErr.mesh
     xStep = (auxMesh.xFin - auxMesh.xStart) / (auxMesh.nx - 1)

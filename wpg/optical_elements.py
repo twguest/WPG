@@ -80,7 +80,7 @@ class Screen(Empty):
         if filename is None:
             filename = "screen.h5"
         # Check type.
-        if not isinstance(filename, (str, unicode)):
+        if not isinstance(filename, (str)):
             raise TypeError(
                 'The parameter "filename" must be str, received %s.' % (type(filename))
             )
@@ -343,8 +343,8 @@ def Aperture(shape, ap_or_ob, Dx, Dy=1e23, x=0, y=0):
 
 
 def Mirror_elliptical(
-    orient, p, q, thetaE, theta0, length, roll=0.0, yaw=0.0, distance=0.0
-):
+    orient, p, q, thetaE, theta0, length, roll=0.0, yaw=0.0,
+    _x = 0, _y = 0, _refl = 1, _ext_in = 0, _ext_out = 0):
     """
     Defining a plane elliptical focusing mirror propagator: A wrapper to a SRWL function SRWLOptMirEl() 
 
@@ -372,9 +372,12 @@ def Mirror_elliptical(
             _nvz=-np.sin(theta0),
             _tvx=-np.sin(theta0),
             _tvy=0,
-            _x=np.tan(yaw) * distance,
-            _y=0,
+            _x=np.tan(yaw) * _x,
+            _y=_y,
             _treat_in_out=1,
+            _refl = 1,
+            _ext_in = 0,
+            _ext_out = 0
         )
     elif orient == "y":  # vertical plane ellipsoidal mirror
         opEFM = SRWLOptMirEl(
@@ -388,9 +391,12 @@ def Mirror_elliptical(
             _nvz=-np.sin(theta0),
             _tvx=0,
             _tvy=-np.sin(theta0),
-            _x=0,
-            _y=np.tan(yaw) * distance,
+            _x=_x,
+            _y=np.tan(yaw) * _y,
             _treat_in_out=1,
+            _refl = 1,
+            _ext_in = 0,
+            _ext_out = 0
         )
     else:
         raise TypeError('orient should be "x" or "y"')
@@ -496,15 +502,16 @@ def Mirror_plane_2d(
     _height_prof_data = np.loadtxt(filename)
     dim = np.shape(_height_prof_data)
     ntotal = dim[0]
-    nx = np.size(np.where(_height_prof_data[:, 1] == _height_prof_data[0, 1]))
-    ny = int(ntotal / nx)
+    nx = dim[0]
+    ny = dim[0]
     print("nx,ny:", nx, ny)
 
-    xax = _height_prof_data[0:nx, 0] * xscale
+    xax = _height_prof_data[0:nx, 0]*  xscale
+    print(xax)
     xmin = min(xax)
     xmax = max(xax)
     xc = (xmin + xmax) / 2
-    yax = _height_prof_data[0:ntotal:nx, 1] * yscale
+    yax = _height_prof_data[0:ny, 1] * yscale
     ymin = min(yax)
     ymax = max(yax)
     yc = (ymin + ymax) / 2
@@ -581,7 +588,6 @@ def Mirror_plane_2d(
                 foo.append(-2 * sinTheta * h_new[ix, iy] * scale)
     opIPM.arTr[1::2] = foo  # Optical Path Difference (to check sign!)
     return opIPM
-
 
 def VLS_grating(
     _mirSub, _m=1, _grDen=100, _grDen1=0, _grDen2=0, _grDen3=0, _grDen4=0, _grAng=0
