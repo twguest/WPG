@@ -12,12 +12,14 @@ This module contains  wrapper for SRWLOptC (optical container) and propagation p
 
 .. moduleauthor:: Alexey Buzmakov <buzmakov@gmail.com>
 """
-
+import os
 import wpg.srwlib as srwlib
 from wpg.srwlib import srwl
 from wpg.utils import srw_obj2str
 import wpg.optical_elements
 
+import datetime 
+from wpg.wpg_uti_wf import plot_intensity_map as plotIntensity
 
 class Beamline(object):
     """
@@ -155,7 +157,46 @@ class Beamline(object):
                         wfr.params.Mesh.zCoord = wfr.params.Mesh.zCoord + opt_element.L
             else:
                 raise ValueError("Unknown type of propagators")
+                
+    def propagateSeq(self, wfr, outdir = None):
+        """
+        Propagate sequentially through each optical element in beamline.
 
+        :param wfr: Input wavefront (will be re-writed after propagation)
+        :param outdir: save directory
+        """
+        
+        date = datetime.datetime.now()
+        mn,h,d,m,y = date.minute, date.hour, date.day, date.month, date.year
+    
+        if outdir is not None:
+            if os.path.exists(outdir):
+                os.mkdir(outdir + "/run_{}-{}-{}_{}-{}/".format(d,m,y,h,mn))
+                outdir = outdir + "/run_{}-{}-{}_{}-{}/".format(d,m,y,h,mn)
+            elif os.path.exists(outdir) == False: 
+                print("Cannot Find Output Directory, Not Saving")
+                outdir = None
+        
+        
+        for itr in range(len(self.propagation_options[0]['optical_elements'])):
+            oe = self.propagation_options[0]['optical_elements'][itr]
+            pp = self.propagation_options[0]['propagation_parameters'][itr]
+            
+            bl = srwlib.SRWLOptC([oe],[pp])
+            
+            srwl.PropagElecField(wfr._srwl_wf, bl)
+            
+            if oe.name is None: 
+                oe.name = "el{}".format(itr)
+            
+            if outdir is not None:
+                plotIntensity(wfr, save = outdir + oe.name)
+            
+                
+                
+                
+            
+            
 
 def _check_srw_pp(pp):
     """

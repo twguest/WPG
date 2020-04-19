@@ -9,7 +9,6 @@ import copy
 import numpy
 import pylab
 
-from wpg.beamline import Beamline
 from wpg.srwlib import srwl
 from wpg.wavefront import Wavefront
 
