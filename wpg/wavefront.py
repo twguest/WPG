@@ -421,8 +421,8 @@ class Wavefront(object):
 
         return px, py
 
-    def write(self, filename):
-        output = open(filename + ".txt", "w")
+    def write(self, outdir):
+        output = open(outdir + ".txt", "w")
         output.write(self.__str__())
         output.close()
         

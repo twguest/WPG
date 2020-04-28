@@ -49,14 +49,13 @@ def calcDivergence(wfr):
     
     return [calculate_fwhm(kfr)['fwhm_x'], calculate_fwhm(kfr)['fwhm_y']]
 
-def sampling(wavelength, propD, roi, dx_i):
+def fresnel_sampling(z, wav, dx1, D2, D1):
     """
-    :param wavelength: source wavelength [m]
-    :param propD: propagation distance [m]
-    :param roi: region of interest (extent of wavefield)
-    :param pixel_i: current pixel size [m]
-    :returns pixel_f: pixel size in propagated plane [m]
+    :param z: propagation distance
+    :param wav: source wavelength
+    :param dx1: pixel size in unpropagated plane
+    :param D2: width of propagated plane
+    :param D1: width of unpropagated plane
     """
-    dx_f = (wavelength*propD)/(roi*dx_i*np.sqrt(2))
-    
-    return dx_f
+    dx2 = (wav*z+dx1*D2)/(D1)
+    return dx2

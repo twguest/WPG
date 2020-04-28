@@ -17,7 +17,7 @@ import wpg.srwlib as srwlib
 from wpg.srwlib import srwl
 from wpg.utils import srw_obj2str
 import wpg.optical_elements
-
+import json
 import datetime 
 from wpg.wpg_uti_wf import plot_intensity_map as plotIntensity
 
@@ -168,7 +168,8 @@ class Beamline(object):
         
         date = datetime.datetime.now()
         mn,h,d,m,y = date.minute, date.hour, date.day, date.month, date.year
-    
+        
+       
         if outdir is not None:
             if os.path.exists(outdir):
                 os.mkdir(outdir + "/run_{}-{}-{}_{}-{}/".format(d,m,y,h,mn))
@@ -177,13 +178,19 @@ class Beamline(object):
                 print("Cannot Find Output Directory, Not Saving")
                 outdir = None
         
+        print(outdir)
         
+        if outdir is not None:
+            wfr.write(outdir + "initialSource")
+            plotIntensity(wfr, save = outdir + "source")
+            
         for itr in range(len(self.propagation_options[0]['optical_elements'])):
             oe = self.propagation_options[0]['optical_elements'][itr]
             pp = self.propagation_options[0]['propagation_parameters'][itr]
             
             bl = srwlib.SRWLOptC([oe],[pp])
             
+            print(oe.name)
             srwl.PropagElecField(wfr._srwl_wf, bl)
             
             if oe.name is None: 
@@ -192,9 +199,13 @@ class Beamline(object):
             if outdir is not None:
                 plotIntensity(wfr, save = outdir + oe.name)
             
-                
-                
-                
+                with open(outdir + "beamline_parameters.json", 'w') as f:
+                    json.dump(self.params, f)
+                    
+                wfr.write(outdir + "finalSource")
+            elif outdir is None:
+                plotIntensity(wfr)
+            
             
             
 
