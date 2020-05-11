@@ -453,3 +453,15 @@ class Wavefront(object):
         Ehor.imag, Ever.imag = np.angle(Ehor), np.angle(Ever)
         
         return np.array([Ehor, Ever])
+    
+    def get_profile_1d(self):
+        """
+        return 1d profiles along the center of each transverse axis.
+        """
+        
+        ii = self.get_intensity().sum(axis = -1)
+        shape = ii.shape
+        ix = ii[:, shape[1]//2]
+        iy = ii[shape[0]//2, :]
+        
+        return ix, iy

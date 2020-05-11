@@ -7483,8 +7483,8 @@ def srwl_opt_setup_surf_height_2d(
     _size_x=0,
     _size_y=0,
     _x = 0,
-    _y = 0
-):
+    _y = 0,
+    _refl = 1):
     """
     Setup Transmission type optical element with 2D (mirror or grating) surface Heght Profile data
     :param _height_prof_data: a matrix (2D array) containing the Height Profile data in [m]; if _ar_height_prof_x is None and _ar_height_prof_y is None: the first column in _height_prof_data is assumed to be the "longitudinal" position [m] and first row the "transverse" position [m], and _height_prof_data[0][0] is not used; otherwise the "longitudinal" and "transverse" positions on the surface are assumed to be given by _ar_height_prof_x, _ar_height_prof_y 
@@ -7754,7 +7754,7 @@ def srwl_opt_setup_surf_height_2d(
             # print(' ')
 
             ofst = 2 * ix + (2 * auxMesh.nx) * iy
-            optSlopeErr.arTr[ofst] = 1.0  # Amplitude Transmission
+            optSlopeErr.arTr[ofst] = sqrt(_refl) # Amplitude Transmission
             optSlopeErr.arTr[ofst + 1] = 0.0  # Optical Path Difference
             if hApprox != 0:
                 # optSlopeErr.arTr[ofst + 1] = -2*sinAng*hApprox #Optical Path Difference (to check sign!)

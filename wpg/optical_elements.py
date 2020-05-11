@@ -343,7 +343,7 @@ def Aperture(shape, ap_or_ob, Dx, Dy=1e23, x=0, y=0):
 
 
 def Mirror_elliptical(
-    orient, p, q, thetaE, theta0, distance, length, roll=0.0, yaw=0.0,
+    orient, p, q, thetaE, theta0, _x,_y, length, roll=0.0, yaw=0.0,
     _refl = 1, _ext_in = 0, _ext_out = 0):
     """
     Defining a plane elliptical focusing mirror propagator: A wrapper to a SRWL function SRWLOptMirEl() 
@@ -372,8 +372,8 @@ def Mirror_elliptical(
             _nvz=-np.sin(theta0),
             _tvx=-np.sin(theta0),
             _tvy=0,
-            _x= np.tan(yaw)*distance,
-            _y=0,
+            _x= _x,
+            _y=_y,
             _treat_in_out=1,
             _refl = 1,
             _ext_in = 0,
@@ -391,8 +391,8 @@ def Mirror_elliptical(
             _nvz=-np.sin(theta0),
             _tvx=0,
             _tvy=-np.sin(theta0),
-            _x=0,
-            _y=np.tan(yaw)*distance,
+            _x=_x,
+            _y=_y,
             _treat_in_out=1,
             _refl = 1,
             _ext_in = 0,
