@@ -202,11 +202,12 @@ class Beamline(object):
                 with open(outdir + "beamline_parameters.json", 'w') as f:
                     json.dump(self.params, f)
                     
-                wfr.write(outdir + "finalSource")
+
             elif outdir is None:
                 plotIntensity(wfr)
             
-            
+        wfr.write(outdir + "finalSource")
+        wfr.save_tif(outdir + "finalSource")
             
 
 def _check_srw_pp(pp):

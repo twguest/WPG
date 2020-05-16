@@ -409,9 +409,9 @@ class Wavefront(object):
         """
         return srw_obj2str(self._srwl_wf)
 
-    def save_tif(self, filename):
-        imgReal = self.II[:, :, 0]
-        imageio.imwrite(filename + ".tif", imgReal)
+    def save_tif(self, outdir):
+        imgReal = self.get_intensity()
+        imageio.imwrite(outdir + ".tif", imgReal)
 
 
     def pixelsize(self):
