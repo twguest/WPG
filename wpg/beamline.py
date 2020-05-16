@@ -169,12 +169,12 @@ class Beamline(object):
         date = datetime.datetime.now()
         mn,h,d,m,y = date.minute, date.hour, date.day, date.month, date.year
         
-        enstr = (wfr.params.photonEnergy*1000).replace(".","-")
+        enstr = str(wfr.params.photonEnergy/1000).replace(".","-")
        
         if outdir is not None:
             if os.path.exists(outdir):
-                os.mkdir(outdir + "/run_{}-{}-{}_{}-{}_{}/".format(d,m,y,h,mn))
-                outdir = outdir + "/run_{}-{}-{}_{}-{}_{}/".format(d,m,y,h,mn)
+                os.mkdir(outdir + "/run_{}-{}-{}_{}-{}_{}keV/".format(d,m,y,h,mn,enstr))
+                outdir = outdir + "/run_{}-{}-{}_{}-{}_{}keV/".format(d,m,y,h,mn,enstr)
             elif os.path.exists(outdir) == False: 
                 print("Cannot Find Output Directory, Not Saving")
                 outdir = None
