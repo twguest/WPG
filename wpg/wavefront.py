@@ -352,7 +352,7 @@ class Wavefront(object):
         sr = self.params.Mesh
         rep = self.params.wSpace
         if rep == "R-space":
-            print(rep)
+            #print(rep)
             if axis == "z":
                 return sr.xMin, sr.xMax, sr.yMax, sr.yMin
             elif axis == "x":
@@ -360,7 +360,7 @@ class Wavefront(object):
             elif axis == "y":
                 return sr.sliceMin, sr.sliceMax, sr.xMax, sr.xMin
         elif rep == "Q-space":
-            print(rep)
+            #print(rep)
             wl = 12.398 * 1e-10 / (self.params.photonEnergy * 1e-3)  # WaveLength
             # wv = 2.*np.pi/wl
             # #WaveVector
@@ -433,7 +433,7 @@ class Wavefront(object):
         returns [Ehor, Ever]
         """
         
-        for slc in range(self.params.nSlices):
+        for slc in range(self.params.Mesh.nSlices):
             
                        
             if slc == 0:
@@ -465,3 +465,5 @@ class Wavefront(object):
         iy = ii[shape[0]//2, :]
         
         return ix, iy
+    
+    

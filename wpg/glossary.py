@@ -20,6 +20,8 @@ import warnings
 import numpy as np
 import array
 
+### filter warnings bc annoying 
+warnings.filterwarnings("ignore")
 
 class RadiationField(object):
 
@@ -713,13 +715,13 @@ class WFRadiationMeshQxMin(RadiationField):
         if self._wf.params.wSpace == "Q-space":
             return self._wf._srwl_wf.mesh.xStart
         else:
-            warnings.warn("params/Mesh/qxMin not defined if NOT params/wSpace==Q-space")
+            pass
             return None
 
     @value.setter
     def value(self, val):
         if not self._wf.params.wSpace == "Q-space":
-            warnings.warn("params/Mesh/qxMin not defined if NOT params/wSpace==Q-space")
+            pass
 
         self._wf._srwl_wf.mesh.xStart = float(val)
 
@@ -771,13 +773,13 @@ class WFRadiationMeshQyMin(RadiationField):
         if self._wf.params.wSpace == "Q-space":
             return self._wf._srwl_wf.mesh.yStart
         else:
-            warnings.warn("params/Mesh/qyMin not defined if NOT params/wSpace==Q-space")
+            pass
             return None
 
     @value.setter
     def value(self, val):
         if not self._wf.params.wSpace == "Q-space":
-            warnings.warn("params/Mesh/qyMin not defined if NOT params/wSpace==Q-space")
+            pass
 
         self._wf._srwl_wf.mesh.yStart = float(val)
 

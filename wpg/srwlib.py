@@ -7749,9 +7749,11 @@ def srwl_opt_setup_surf_height_2d(
             a11 = f00 - f01 - f10 + f11
             hApprox = xt * (a10 + a11 * yt) + a01 * yt + f00
 
-            # print('     x:', x1, x, x2, 'y:', y1, y, y2)
-            # print('h:', hApprox, f00, f10, f01, f11, 'ii:', ipStartTr, ipStart)
-            # print(' ')
+# =============================================================================
+#             print('     x:', x1, x, x2, 'y:', y1, y, y2)
+#             print('h:', hApprox, f00, f10, f01, f11, 'ii:', ipStartTr, ipStart)
+#             print(' ')
+# =============================================================================
 
             ofst = 2 * ix + (2 * auxMesh.nx) * iy
             optSlopeErr.arTr[ofst] = sqrt(_refl) # Amplitude Transmission
