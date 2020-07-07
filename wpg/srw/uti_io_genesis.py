@@ -1,37 +1,37 @@
 #############################################################################
-# This is a subset of Gianluca's and Ilya's module to read-in Genesis output files
-# and to generate SRW wavefront structure
+#This is a subset of Gianluca's and Ilya's module to read-in Genesis output files
+#and to generate SRW wavefront structure
 #############################################################################
 
-# from mpi4py import MPI
-# comm  = MPI.COMM_WORLD   #Creates one common object "communicator" knwoning about processes
-# rank  = comm.Get_rank()  #Process number
-# nproc = comm.Get_size()  #Total number of processes
+#from mpi4py import MPI
+#comm  = MPI.COMM_WORLD   #Creates one common object "communicator" knwoning about processes
+#rank  = comm.Get_rank()  #Process number
+#nproc = comm.Get_size()  #Total number of processes
 
-from __future__ import print_function  # Python 2.7 compatibility
+from __future__ import print_function #Python 2.7 compatibility
 from srwlib import *
 
-# from xframework.adaptors.genesis import *
+#from xframework.adaptors.genesis import *
 ##################from ocelot.adaptors.genesis import *
 
-# from prop_lines import *
+#from prop_lines import *
 import copy
 import struct
 
-# from scipy import interpolate
+#from scipy import interpolate
 
 ##################################################################################################################
 ############################################ ROUTINES FROM OCELOT ################################################
 ####                                                                                                          ####
 #### These are to read the Genesis Output file; necessary here in order to make the module 'standalone' ##########
 #######                                          i.e. without Ocelot                                    ##########
-##################################################################################################################
+##################################################################################################################              
 
-# import numpy as np
-# from copy import copy, deepcopy
-
+#import numpy as np
+#from copy import copy, deepcopy
 
 class GenesisOutput:
+    
     def __init__(self):
         self.z = []
         self.I = []
@@ -40,246 +40,226 @@ class GenesisOutput:
         self.E = []
         self.aw = []
         self.qfld = []
-
+        
         self.sliceKeys = []
         self.sliceValues = {}
-
+        
         self.parameters = {}
-
+    
     def __call__(self, name):
-        """
+        '''
         if name not in self.__dict__.keys():
             return 0
         else:
             return self.__dict__[name]
-        """
+        '''
         if name not in self.parameters.keys():
             return 0.0
         else:
-            (p,) = self.parameters[name]
-            return float(p.replace("D", "E"))
+            p, = self.parameters[name]
+            return float(p.replace('D','E'))
+        
 
-
-# ******************************************************************************
+#******************************************************************************
 def uti_io_read_Genesis_output(fileName, _short=True):
-    # def readGenesisOutput(fileName, ):
+#def readGenesisOutput(fileName, ):
 
     out = GenesisOutput()
-
-    chunk = "header"
-
-    # nSlice = 0
-
-    f = open(fileName, "r")
+    
+    chunk = 'header'
+    
+    #nSlice = 0
+    
+    f=open(fileName,'r')
     f.readline()
     for line in f:
 
-        # print(line)
-
-        # tokens = line.replace('=', ' ').split()
+        #print(line)
+        
+        #tokens = line.replace('=', ' ').split()
         tokens = line.strip().split()
 
         if len(tokens) < 1:
-            # chunk = 'none'
+            #chunk = 'none'
             continue
+        
+        if tokens == ['z[m]', 'aw', 'qfld']:
 
-        if tokens == ["z[m]", "aw", "qfld"]:
-
-            if _short:
-                return out  # OC
-
-            chunk = "optics"
-            # print 'reading optics '
-            print("reading optics")
+            if(_short): return out #OC
+            
+            chunk = 'optics'
+            #print 'reading optics '
+            print('reading optics')
             continue
-
-        if tokens[0] == "Input":
-            chunk = "input"
-            # print 'reading input parameters'
-            # print('reading input parameters')
+        
+        if tokens[0] == 'Input':
+            chunk = 'input'
+            #print 'reading input parameters'
+            #print('reading input parameters')
             continue
-
-        # ********** output: slice    10
-        if tokens[0] == "**********":
-            # print 'slice:', tokens[3]
-            chunk = "slices"
+        
+        #********** output: slice    10
+        if tokens[0] == '**********':
+            #print 'slice:', tokens[3]
+            chunk = 'slices'
             nSlice = int(tokens[3])
-
-        if tokens[0] == "power":
-            chunk = "slice"
+         
+        if tokens[0] == 'power':
+            chunk = 'slice'
             out.sliceKeys = copy.copy(tokens)
-            # out.sliceValues[nSlice] = copy.copy(tokens)
+            #out.sliceValues[nSlice] = copy.copy(tokens)
             out.sliceValues[nSlice] = {}
-            for i in range(0, len(tokens)):
+            for i in range(0,len(tokens)):
                 out.sliceValues[nSlice][out.sliceKeys[i]] = []
-            # print 'reading slices'
-            # print out.sliceKeys
-            # print out.sliceValues[nSlice]
+            #print 'reading slices'
+            #print out.sliceKeys
+            #print out.sliceValues[nSlice]
             continue
-
-        if chunk == "optics":
-            z, aw, qfld = map(float, tokens)
+            
+        if chunk == 'optics':
+            z,aw,qfld = map(float,tokens)
             out.z.append(z)
             out.aw.append(aw)
             out.qfld.append(qfld)
-
-        if chunk == "input":
-            # tokens=line.replace('=','').strip().split()
-            tokens = (
-                line.replace("=", " ").strip().split()
-            )  # OC: fix to ensure correct parsing of tokens like 'nslice=10932'
+            
+        if chunk == 'input':
+            #tokens=line.replace('=','').strip().split()
+            tokens=line.replace('=',' ').strip().split() #OC: fix to ensure correct parsing of tokens like 'nslice=10932'
             out.parameters[tokens[0]] = tokens[1:]
-            # print('input:', tokens)
+            #print('input:', tokens)
 
-        if chunk == "slice":
+        if chunk == 'slice':
 
-            vals = map(float, tokens)
-            if sys.hexversion >= 0x030000F0:
-                vals = list(vals)  # OC: for compatibility with Py3
-
-            # print vals
-            for i in range(0, len(vals)):
+            vals = map(float,tokens)
+            if sys.hexversion >= 0x030000F0: vals = list(vals) #OC: for compatibility with Py3
+            
+            #print vals
+            for i in range(0,len(vals)):
                 out.sliceValues[nSlice][out.sliceKeys[i]].append(vals[i])
+            
+            #out.zSlice.append(vals[2])
+            #out.aw.append(aw)
+            #out.qfld.append(qfld)
 
-            # out.zSlice.append(vals[2])
-            # out.aw.append(aw)
-            # out.qfld.append(qfld)
-
-        if chunk == "slices":
-            if len(tokens) == 2 and tokens[1] == "current":
-                # print tokens[1]
+        if chunk == 'slices':
+            if len(tokens) == 2 and tokens[1]=='current':
+                #print tokens[1]
                 out.I.append(float(tokens[0]))
                 out.n.append(nSlice)
 
-    # out.nSlices = int(out('nslice'))
-    # out.nSlices = len(out.sliceValues)
-    # out.nZ = len(out.sliceValues[1][out.sliceKeys[0]])
+    #out.nSlices = int(out('nslice'))
+    #out.nSlices = len(out.sliceValues) 
+    #out.nZ = len(out.sliceValues[1][out.sliceKeys[0]])
 
-    # print 'nSlice', out.nSlices
-    # print 'nZ', out.nZ
-    # print('nSlice', out.nSlices)
-    # print('nZ', out.nZ)
+    #print 'nSlice', out.nSlices
+    #print 'nZ', out.nZ
+    #print('nSlice', out.nSlices)
+    #print('nZ', out.nZ)
 
     return out
 
-
-# ******************************************************************************
-# def uti_io_read_Genesis_rad(fileName='simulation.gout.dfl', npoints=51, slice_start=0, slice_end = -1, idx=None):
-def uti_io_read_Genesis_rad(
-    fileName="simulation.gout.dfl",
-    _ncar=51,
-    _mult=1.0,
-    _slice_skip_per=0,
-    _slice_start=0,
-    _slice_end=-1,
-    _align_out="txy",
-):
-
-    # def read_in_chunks(_file, _size=1024):
+#******************************************************************************
+#def uti_io_read_Genesis_rad(fileName='simulation.gout.dfl', npoints=51, slice_start=0, slice_end = -1, idx=None):
+def uti_io_read_Genesis_rad(fileName='simulation.gout.dfl', _ncar=51, _mult=1., _slice_skip_per=0, _slice_start=0, _slice_end=-1, _align_out='txy'):
+    
+    #def read_in_chunks(_file, _size=1024):
     #    while True:
     #        data = _file.read(_size)
     #        if not data:
     #            break
     #        yield data
 
-    # def read_in_data_block(_file, _ofst=0, _size=1024):
+    #def read_in_data_block(_file, _ofst=0, _size=1024):
     #    if(_ofst > 0): _file.seek(_ofst)
     #    return _file.read(_size)
 
-    ncarE2 = _ncar * _ncar
-    slice_size = int(ncarE2 * 16)
+    ncarE2 = _ncar*_ncar
+    slice_size = int(ncarE2*16)
 
-    f = open(fileName, "rb")
+    f = open(fileName,'rb')
+    
+    f.seek(0,2)
+    #total_data_len = f.tell() / 8 / 2
+    total_data_len = f.tell() / 16 # = _ncar*_ncar*n_slice
 
-    f.seek(0, 2)
-    # total_data_len = f.tell() / 8 / 2
-    total_data_len = f.tell() / 16  # = _ncar*_ncar*n_slice
-
-    nSliceTot = int(round(total_data_len / ncarE2))
+    nSliceTot = int(round(total_data_len/ncarE2))
     iSliceEnd = int(_slice_end)
-    if _slice_end < 0:
-        iSliceEnd = nSliceTot - 1
+    if(_slice_end < 0): iSliceEnd = nSliceTot - 1
 
-    nSliceToRead = int((iSliceEnd + 1 - _slice_start) / (_slice_skip_per + 1))
-    nResVal = nSliceToRead * ncarE2 * 2
+    nSliceToRead = int((iSliceEnd + 1 - _slice_start)/(_slice_skip_per + 1))
+    nResVal = nSliceToRead*ncarE2*2
+    
+    #print('starting array allocation...')
+    resFldData = srwl_uti_array_alloc('f', nResVal)
+    #print('done')
 
-    # print('starting array allocation...')
-    resFldData = srwl_uti_array_alloc("f", nResVal)
-    # print('done')
-
-    # if _slice_start > 0:
+    #if _slice_start > 0:
     #    f.seek(slice_size*slice_start,0)
 
-    # if slice_end > 0:
+    #if slice_end > 0:
     #    data_size = (slice_end - slice_start) * slice_size
-    # else:
+    #else:
     #    data_size = total_data_len * 16 - (slice_start) * slice_size
 
-    # print('slice size = ', slice_size)
-    # print('data size = ', data_size)
-    # print('total_data_len = ', total_data_len)
-
-    # ncar = int(np.sqrt((slice_size/16)))
-    # print('ncar=', ncar)
-
-    # n_slices = total_data_len / (slice_size/16)
-
-    # if idx == None:
-    # slices = np.zeros([n_slices,ncar,ncar], dtype=complex)
-    # slices = array('f', [0]*(n_slices*ncar*ncar*2))
-    # slices = srwl_uti_array_alloc('f', (total_data_len*2))
-    # else:
-    # slices = np.zeros([len(idx),ncar,ncar], dtype=complex)
-    # slices = array('f', [0]*(len(idx)*ncar*ncar*2))
-    # slices = srwl_uti_array_alloc('f', (len(idx)*ncarE2*2))
+    #print('slice size = ', slice_size)
+    #print('data size = ', data_size)
+    #print('total_data_len = ', total_data_len)
+    
+    #ncar = int(np.sqrt((slice_size/16)))
+    #print('ncar=', ncar)
+    
+    #n_slices = total_data_len / (slice_size/16)
+    
+    #if idx == None:
+        #slices = np.zeros([n_slices,ncar,ncar], dtype=complex)
+        #slices = array('f', [0]*(n_slices*ncar*ncar*2))
+        #slices = srwl_uti_array_alloc('f', (total_data_len*2))
+    #else:
+        #slices = np.zeros([len(idx),ncar,ncar], dtype=complex)
+        #slices = array('f', [0]*(len(idx)*ncar*ncar*2))
+        #slices = srwl_uti_array_alloc('f', (len(idx)*ncarE2*2))
 
     perT = 2
-    perX = nSliceToRead * perT
-    perY = perX * _ncar
+    perX = nSliceToRead*perT
+    perY = perX*_ncar
 
-    if (_align_out == "xyt") or (_align_out == "xye"):
+    if((_align_out == 'xyt') or (_align_out == 'xye')):
         perX = 2
-        perY = perX * _ncar
-        perT = perY * _ncar
-    elif (_align_out == "yxt") or (_align_out == "yxe"):
+        perY = perX*_ncar
+        perT = perY*_ncar
+    elif((_align_out == 'yxt') or (_align_out == 'yxe')):
         perY = 2
-        perX = perY * _ncar
-        perT = perX * _ncar
-    # else...
+        perX = perY*_ncar
+        perT = perX*_ncar
+    #else...
 
     nSliceToRead_mi1 = nSliceToRead - 1
 
-    ofstFile = _slice_start * slice_size
-    ofstFileStep = _slice_skip_per * slice_size
+    ofstFile = _slice_start*slice_size
+    ofstFileStep = _slice_skip_per*slice_size
     f.seek(ofstFile, 0)
 
     for iSlice in range(nSliceToRead):
         piece = f.read(slice_size)
-        iSlice_perT = iSlice * perT
+        iSlice_perT = iSlice*perT
         i = 0
         for iy in range(_ncar):
-            iy_perY = iy * perY
+            iy_perY = iy*perY
             for ix in range(_ncar):
-                ofstRes = int(iSlice_perT + ix * perX + iy_perY)
-                i16 = i * 16
+                ofstRes = int(iSlice_perT + ix*perX + iy_perY)
+                i16 = i*16
                 i16p8 = i16 + 8
-                resFldData[ofstRes] = _mult * (struct.unpack("d", piece[i16:i16p8])[0])
-                resFldData[ofstRes + 1] = _mult * (
-                    struct.unpack("d", piece[i16p8 : i16p8 + 8])[0]
-                )
+                resFldData[ofstRes] = _mult*(struct.unpack('d', piece[i16 : i16p8])[0])
+                resFldData[ofstRes + 1] = _mult*(struct.unpack('d', piece[i16p8 : i16p8 + 8])[0])
                 i += 1
-        if _slice_skip_per > 0:
-            if iSlice < nSliceToRead_mi1:
-                f.seek(ofstFileStep, 1)  # move to next read position
+        if(_slice_skip_per > 0):
+            if(iSlice < nSliceToRead_mi1): f.seek(ofstFileStep, 1) #move to next read position
 
-        # print('slices read:', iSlice)
+        #print('slices read:', iSlice)
     return resFldData
 
-
-# ******************************************************************************
-def uti_io_set_wfr_from_Genesis_files(
-    _fpGenOut, _fpGenRad, _pol="h", _slice_skip_per=0, _slice_start=0, _slice_end=-1
-):
+#******************************************************************************
+def uti_io_set_wfr_from_Genesis_files(_fpGenOut, _fpGenRad, _pol='h', _slice_skip_per=0, _slice_start=0, _slice_end=-1):
     """Sets up SRW wavefront from Genesis output
     :param _fpGenOut: file path to Genesis Output file
     :param _fpGenRad: file path to Genesis Radiation file
@@ -290,89 +270,72 @@ def uti_io_set_wfr_from_Genesis_files(
     """
 
     outGenesis = uti_io_read_Genesis_output(_fpGenOut)
-
-    ncar = int(outGenesis("ncar"))
-    zrayl = outGenesis("zrayl")
-    rmax0 = outGenesis("rmax0")
-    xlamds = outGenesis("xlamds")
-    rxbeam = outGenesis("rxbeam")
-    rybeam = outGenesis("rybeam")
-    zsep = outGenesis("zsep")
-    ntail = outGenesis("ntail")
-    itdp = int(outGenesis("itdp"))
-    xlamd = outGenesis("xlamd")
+    
+    ncar = int(outGenesis('ncar'))
+    zrayl = outGenesis('zrayl')
+    rmax0 = outGenesis('rmax0')
+    xlamds = outGenesis('xlamds')
+    rxbeam = outGenesis('rxbeam')
+    rybeam = outGenesis('rybeam')
+    zsep = outGenesis('zsep')
+    ntail = outGenesis('ntail')
+    itdp = int(outGenesis('itdp'))
+    xlamd = outGenesis('xlamd')
 
     pi = 3.14159265358979
-    lightSpeed = 2.9979245812e08  # Speed of Light [m/c]
+    lightSpeed = 2.9979245812E+08 #Speed of Light [m/c]
     light_eV_mu = 1.23984186
-    # vacimp = 376.7303135 #Vacuum impedance in Ohms
-    # eev = 510998.902 #Energy units (mc^2) in eV
+    #vacimp = 376.7303135 #Vacuum impedance in Ohms
+    #eev = 510998.902 #Energy units (mc^2) in eV
 
-    photEn_xlamds = light_eV_mu * 1.0e-06 / xlamds
+    photEn_xlamds = light_eV_mu*1.e-06/xlamds
 
-    w0 = sqrt(zrayl * xlamds / pi)
-    sigrB = sqrt(rxbeam * rxbeam + rybeam * rybeam)
-    # sigrF = w0
-    dGrid = (
-        0.5 * rmax0 * (sigrB + w0)
-    )  # Mesh from -grid to +grid; This is the genesis input parameter dgrid/2
+    w0 = sqrt(zrayl*xlamds/pi)
+    sigrB = sqrt(rxbeam*rxbeam + rybeam*rybeam)
+    #sigrF = w0
+    dGrid = 0.5*rmax0*(sigrB + w0) #Mesh from -grid to +grid; This is the genesis input parameter dgrid/2
 
-    # This defines a constant to be used for conversion (multiplication) of GENESIS Electric field
-    # to SRW TD Electric Field in units of sqrt(W/mm^2)
-    # xkper0 = 2*pi/xlamd #undulator "wavenumber"
-    # xks = 2*pi/xlamds
-    # convE_Gen2SRW = (1e-03)*xkper0*xkper0*eev/(xks*sqrt(vacimp))
+    #This defines a constant to be used for conversion (multiplication) of GENESIS Electric field
+    #to SRW TD Electric Field in units of sqrt(W/mm^2)
+    #xkper0 = 2*pi/xlamd #undulator "wavenumber"
+    #xks = 2*pi/xlamds
+    #convE_Gen2SRW = (1e-03)*xkper0*xkper0*eev/(xks*sqrt(vacimp))
 
-    xStep = 2.0 * dGrid / (ncar - 1)
-    convE_Gen2SRW = sqrt(1.0e-06 / (xStep * xStep))  # ? See Genesis 1.3 manual, page 41
-    # convE_Gen2SRW = 1. #?
-    # print('convE_Gen2SRW=', convE_Gen2SRW)
+    xStep = 2.*dGrid/(ncar - 1)
+    convE_Gen2SRW = sqrt(1.e-06/(xStep*xStep)) #? See Genesis 1.3 manual, page 41
+    #convE_Gen2SRW = 1. #?
+    #print('convE_Gen2SRW=', convE_Gen2SRW)
 
-    arEx = uti_io_read_Genesis_rad(
-        _fpGenRad, ncar, _mult=convE_Gen2SRW, _slice_skip_per=_slice_skip_per
-    )
+    arEx = uti_io_read_Genesis_rad(_fpGenRad, ncar, _mult=convE_Gen2SRW, _slice_skip_per=_slice_skip_per)
     lenArE = len(arEx)
-    nt = int(round(lenArE / (ncar * ncar * 2)))
+    nt = int(round(lenArE/(ncar*ncar*2)))
     arEy = None
-    if _pol == "v":  # to treat circular polarization!?
+    if(_pol == 'v'): #to treat circular polarization!?
         arEy = arEx
         arEx = None
-    if arEx == None:
-        arEx = srwl_uti_array_alloc("f", lenArE)
-    if arEy == None:
-        arEy = srwl_uti_array_alloc("f", lenArE)
+    if(arEx == None): arEx = srwl_uti_array_alloc('f', lenArE)
+    if(arEy == None): arEy = srwl_uti_array_alloc('f', lenArE)
 
-    tStepOrig = xlamds * zsep / lightSpeed
-    tStep = tStepOrig * (_slice_skip_per + 1)
-    tStartOrig = xlamds * zsep * ntail / lightSpeed
-    tStart = tStartOrig + _slice_start * tStepOrig
-    tEnd = tStart + tStep * (nt - 1)
+    tStepOrig = xlamds*zsep/lightSpeed;
+    tStep = tStepOrig*(_slice_skip_per + 1)
+    tStartOrig = xlamds*zsep*ntail/lightSpeed;
+    tStart = tStartOrig + _slice_start*tStepOrig
+    tEnd = tStart + tStep*(nt - 1)
 
-    presFT = 1  # presentation/domain: 0- frequency (photon energy), 1- time
-
-    if itdp == 0:
-        tStart = photEn_xlamds  # to treat harmonics!!!
+    presFT = 1 #presentation/domain: 0- frequency (photon energy), 1- time
+    
+    if(itdp == 0):
+        tStart = photEn_xlamds #to treat harmonics!!!
         tStep = 0
         presFT = 0
 
-    wfr = SRWLWfr(
-        arEx,
-        arEy,
-        _typeE="f",
-        _eStart=tStart,
-        _eFin=tEnd,
-        _ne=nt,
-        _xStart=-dGrid,
-        _xFin=dGrid,
-        _nx=ncar,
-        _yStart=-dGrid,
-        _yFin=dGrid,
-        _ny=ncar,
-        _zStart=0,
-    )
+    wfr = SRWLWfr(arEx, arEy, _typeE='f',
+                  _eStart=tStart, _eFin=tEnd, _ne=nt,
+                  _xStart=-dGrid, _xFin=dGrid, _nx=ncar,
+                  _yStart=-dGrid, _yFin=dGrid, _ny=ncar, _zStart=0)
     wfr.avgPhotEn = photEn_xlamds
     wfr.presFT = presFT
-    wfr.unitElFld = 2  # electric field units are sqrt(J/eV/mm^2) or sqrt(W/mm^2), depending on representation (freq. or time)
+    wfr.unitElFld = 2 #electric field units are sqrt(J/eV/mm^2) or sqrt(W/mm^2), depending on representation (freq. or time)
 
     return wfr
 

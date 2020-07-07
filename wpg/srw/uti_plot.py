@@ -30,13 +30,15 @@ Modules:
 .. moduleauthor:: Rob Nagler <nagler@radiasoft.net>
 """
 import sys
-import uti_plot_com
+try:
+    from wpg.srw import uti_plot_com
+except ImportError:
+    import uti_plot_com
 import traceback
 
 _backend = None
 
-DEFAULT_BACKEND = "<default>"
-
+DEFAULT_BACKEND = '<default>'
 
 def uti_plot_init(backend=DEFAULT_BACKEND, fname_format=None):
     """Initializes plotting engine with backend and, optionally, save plots to fname_format
@@ -55,86 +57,57 @@ def uti_plot_init(backend=DEFAULT_BACKEND, fname_format=None):
     if backend is not None:
         try:
             import uti_plot_matplotlib
-
             _backend = uti_plot_matplotlib.Backend(backend, fname_format)
             return
         except:
             traceback.print_exc()
-            print(
-                backend
-                + ": unable to import specified backend (or its dependency); no plots"
-            )
+            print(backend + ': unable to import specified backend (or its dependency); no plots')
     elif fname_format is not None:
-        # raise Value(fname_format + ': fname_format must be null if backend is None')
-        raise ValueError(
-            fname_format + ": fname_format must be null if backend is None"
-        )
+        #raise Value(fname_format + ': fname_format must be null if backend is None')
+        raise ValueError(fname_format + ': fname_format must be null if backend is None')
     _backend = _BackendNone()
-
 
 def uti_plot_show():
     """Display the plots"""
-    # if '_backend' not in locals(): uti_plot_init() #?
+    #if '_backend' not in locals(): uti_plot_init() #?
     _backend.uti_plot_show()
 
-
-def uti_plot1d(ar1d, x_range, labels=("Photon Energy [eV]", "ph/s/0.1%bw"), units=None):
+def uti_plot1d(ar1d, x_range, labels=('Photon Energy [eV]', 'ph/s/0.1%bw'), units=None):
     """Generate one-dimensional line plot from given array
 
     :param array ar1d: data points
     :param list x_range: Passed to numpy.linspace(start sequence, stop sequnce, num samples)
     :param tuple labels: [x-axis, y-axis]
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-
-    if units is not None:
+    #if '_backend' not in locals(): uti_plot_init() #?
+    
+    if(units is not None):
         x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
         units = [x_unit, units[1]]
-        strTitle = "" if (len(labels) < 3) else labels[2]
-        labels = (
-            labels[0] + " [" + units[0] + "]",
-            labels[1] + " [" + units[1] + "]",
-            strTitle,
-        )
+        strTitle = '' if(len(labels) < 3) else labels[2]
+        labels = (labels[0] + ' [' + units[0] + ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
     _backend.uti_plot1d(ar1d, x_range, labels)
 
-
-def uti_plot1d_ir(
-    ary,
-    arx,
-    labels=("Longitudinal Position [m]", "Horizontal Position [m]"),
-    units=None,
-):  # OC15112017
+def uti_plot1d_ir(ary, arx, labels=('Longitudinal Position [m]', 'Horizontal Position [m]'), units=None): #OC15112017
     """Generate one-dimensional line plot from given array
 
     :param array arx: abscissa array
     :param array ary: ordinate array
     :param tuple labels: [x-axis, y-axis]
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-
-    if units is not None:
-        # x_range = [min(arx), max(arx), len(arx)]
-        # x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
-        # units = [x_unit, units[1]]
-        strTitle = "" if (len(labels) < 3) else labels[2]
-        labels = (
-            labels[0] + " [" + units[0] + "]",
-            labels[1] + " [" + units[1] + "]",
-            strTitle,
-        )
+    #if '_backend' not in locals(): uti_plot_init() #?
+    
+    if(units is not None):
+        #x_range = [min(arx), max(arx), len(arx)]
+        #x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
+        #units = [x_unit, units[1]]
+        strTitle = '' if(len(labels) < 3) else labels[2]
+        labels = (labels[0] + ' [' + units[0] + ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
     _backend.uti_plot1d_ir(ary, arx, labels)
 
-
-def uti_plot2d(
-    ar2d,
-    x_range,
-    y_range,
-    labels=("Horizontal Position [m]", "Vertical Position [m]"),
-    units=None,
-):
+def uti_plot2d(ar2d, x_range, y_range, labels=('Horizontal Position [m]','Vertical Position [m]'), units=None):
     """Generate quad mesh plot from given "flattened" array
 
     :param array ar2d: data points
@@ -142,31 +115,17 @@ def uti_plot2d(
     :param list y_range: y axis (same structure as x_range)
     :param tuple labels: [x-axis, y-axis]
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-    if units is not None:
+    #if '_backend' not in locals(): uti_plot_init() #?
+    if(units is not None):
         x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
         y_range, y_unit = uti_plot_com.rescale_dim(y_range, units[1])
-        units = [x_unit, y_unit, units[2]]
-        strTitle = "" if (len(labels) < 3) else labels[2]
-        labels = (
-            labels[0] + " [" + units[0] + "]",
-            labels[1] + " [" + units[1] + "]",
-            strTitle,
-        )
+        units = [x_unit, y_unit,  units[2]]
+        strTitle = '' if(len(labels) < 3) else labels[2]
+        labels = (labels[0] + ' [' + units[0]+ ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
     _backend.uti_plot2d(ar2d, x_range, y_range, labels)
 
-
-def uti_plot2d1d(
-    ar2d,
-    x_range,
-    y_range,
-    x=0,
-    y=0,
-    labels=("Horizontal Position", "Vertical Position", "Intensity"),
-    units=None,
-    graphs_joined=True,
-):
+def uti_plot2d1d(ar2d, x_range, y_range, x=0, y=0, labels=('Horizontal Position', 'Vertical Position', 'Intensity'), units=None, graphs_joined=True):
     """Generate 2d quad mesh plot from given "flattened" array, and 1d cuts passing through (x, y)
 
     :param array ar2d: data points
@@ -178,65 +137,55 @@ def uti_plot2d1d(
     :param tuple units: [x-axis, y-axis, z-axis]
     :param graphs_joined: switch specifying whether the 2d plot and 1d cuts have to be displayed in one panel or separately
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-    if units is not None:  # checking / re-scaling x, y
+    
+    #if '_backend' not in locals(): uti_plot_init() #?
+    if(units is not None): #checking / re-scaling x, y
+
+        #OC17032019
+        xRangeOrig = x_range[1] - x_range[0]
+        yStartOrig = y_range[1] - y_range[0]
+        
         x_range, x_unit = uti_plot_com.rescale_dim(x_range, units[0])
         y_range, y_unit = uti_plot_com.rescale_dim(y_range, units[1])
-        units = [x_unit, y_unit, units[2]]
+
+        #OC17032019
+        if(x != 0): x *= (x_range[1] - x_range[0])/xRangeOrig
+        if(y != 0): y *= (y_range[1] - y_range[0])/yRangeOrig
+        
+        units = [x_unit, y_unit,  units[2]]
 
         strTitle = labels[2]
-        label2D = (
-            labels[0] + " [" + units[0] + "]",
-            labels[1] + " [" + units[1] + "]",
-            strTitle,
-        )
+        label2D = (labels[0] + ' [' + units[0]+ ']', labels[1] + ' [' + units[1] + ']', strTitle)
 
-        strTitle = "At " + labels[1] + ": " + str(y)
-        if y != 0:
-            strTitle += " " + units[1]
-        label1X = (
-            labels[0] + " [" + units[0] + "]",
-            labels[2] + " [" + units[2] + "]",
-            strTitle,
-        )
+        #strTitle = 'At ' + labels[1] + ': ' + str(y)
+        strTitle = 'At ' + labels[1] + ': ' + str(round(y, 6)) #OC17032019
+        
+        if y != 0: strTitle += ' ' + units[1]
+        label1X = (labels[0] + ' [' + units[0] + ']', labels[2] + ' [' + units[2] + ']', strTitle)
 
-        strTitle = "At " + labels[0] + ": " + str(x)
-        if x != 0:
-            strTitle += " " + units[0]
-        label1Y = (
-            labels[1] + " [" + units[1] + "]",
-            labels[2] + " [" + units[2] + "]",
-            strTitle,
-        )
-
-    else:  # OC081115
+        #strTitle = 'At ' + labels[0] + ': ' + str(x)
+        strTitle = 'At ' + labels[0] + ': ' + str(round(x, 6)) #OC17032019
+        
+        if x != 0: strTitle += ' ' + units[0]
+        label1Y = (labels[1] + ' [' + units[1] + ']', labels[2] + ' [' + units[2] + ']', strTitle)
+        
+    else: #OC081115
         strTitle = labels[2]
         label2D = (labels[0], labels[1], strTitle)
 
-        strTitle = "At " + labels[1] + ": " + str(y)
+        strTitle = 'At ' + labels[1] + ': ' + str(y)
         label1X = (labels[0], labels[2], strTitle)
 
-        strTitle = "At " + labels[0] + ": " + str(x)
+        strTitle = 'At ' + labels[0] + ': ' + str(x)
         label1Y = (labels[1], labels[2], strTitle)
 
     labels = [label2D, label1X, label1Y]
 
     _backend.uti_plot2d1d(ar2d, x_range, y_range, x, y, labels, graphs_joined)
 
-
-def uti_plot_data_file(
-    _fname,
-    _read_labels=1,
-    _e=0,
-    _x=0,
-    _y=0,
-    _graphs_joined=True,  # Same as uti_data_file_plot, but better fits function name decoration rules in this module (uti_plot*)
-    _multicolumn_data=False,
-    _column_x=None,
-    _column_y=None,  # MR31102017
-    _scale="linear",
-    _width_pixels=None,
-):
+def uti_plot_data_file(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True, #Same as uti_data_file_plot, but better fits function name decoration rules in this module (uti_plot*)
+                       _multicolumn_data=False, _column_x=None, _column_y=None, #MR31102017
+                       _scale='linear', _width_pixels=None):
     """Generate plot from configuration in _fname
 
     :param str _fname: config loaded from here
@@ -251,38 +200,17 @@ def uti_plot_data_file(
     :param str _scale: the scale to use for plotting data (linear by default, but could use log, log2, log10)  
     :param int _width_pixels: the width of the final plot in pixels  
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-    _backend.uti_plot_data_file(
-        _fname,
-        _read_labels,
-        _e,
-        _x,
-        _y,
-        _graphs_joined,
-        _multicolumn_data,
-        _column_x,
-        _column_y,  # MR31102017
-        _scale,
-        _width_pixels,
-    )
+    #if '_backend' not in locals(): uti_plot_init() #?
+    _backend.uti_plot_data_file(_fname, _read_labels, _e, _x, _y, _graphs_joined,
+                                _multicolumn_data, _column_x, _column_y, #MR31102017
+                                _scale, _width_pixels)
 
-
-# def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True):
-# def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True, _traj_report=False, _traj_axis='x'): #MR29072016
-# def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True, _traj_report=False, _traj_axis='x', _scale='linear', _width_pixels=None): #MR20012017
-def uti_data_file_plot(
-    _fname,
-    _read_labels=1,
-    _e=0,
-    _x=0,
-    _y=0,
-    _graphs_joined=True,
-    _multicolumn_data=False,
-    _column_x=None,
-    _column_y=None,  # MR31102017
-    _scale="linear",
-    _width_pixels=None,
-):
+#def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True):
+#def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True, _traj_report=False, _traj_axis='x'): #MR29072016
+#def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True, _traj_report=False, _traj_axis='x', _scale='linear', _width_pixels=None): #MR20012017  
+def uti_data_file_plot(_fname, _read_labels=1, _e=0, _x=0, _y=0, _graphs_joined=True,
+                       _multicolumn_data=False, _column_x=None, _column_y=None, #MR31102017
+                       _scale='linear', _width_pixels=None):
     """Generate plot from configuration in _fname
 
     :param str _fname: config loaded from here
@@ -297,32 +225,18 @@ def uti_data_file_plot(
     :param str _scale: the scale to use for plotting data (linear by default, but could use log, log2, log10)  
     :param int _width_pixels: the width of the final plot in pixels  
     """
-    # if '_backend' not in locals(): uti_plot_init() #?
-    # _backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined)
-    # _backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined, _traj_report, _traj_axis) #MR29072016
-    # _backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined, _traj_report, _traj_axis, _scale, _width_pixels) #MR20012017
-    # _backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined,
+    #if '_backend' not in locals(): uti_plot_init() #?
+    #_backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined)
+    #_backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined, _traj_report, _traj_axis) #MR29072016
+    #_backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined, _traj_report, _traj_axis, _scale, _width_pixels) #MR20012017  
+    #_backend.uti_data_file_plot(_fname, _read_labels, _e, _x, _y, _graphs_joined,
     #                            _multicolumn_data, _column_x, _column_y, #MR31102017
     #                            _scale, _width_pixels)
-    uti_plot_data_file(
-        _fname,
-        _read_labels,
-        _e,
-        _x,
-        _y,
-        _graphs_joined,
-        _multicolumn_data,
-        _column_x,
-        _column_y,
-        _scale,
-        _width_pixels,
-    )  # OC16112017
-
+    uti_plot_data_file(_fname, _read_labels, _e, _x, _y, _graphs_joined, _multicolumn_data, _column_x, _column_y, _scale, _width_pixels) #OC16112017
 
 class _BackendBase(object):
     def __getattr__(self, attr):
         return self._backend_call
-
 
 class _BackendMissing(_BackendBase):
     def _backend_call(self, *args, **kwargs):
@@ -331,10 +245,8 @@ class _BackendMissing(_BackendBase):
         func = getattr(_backend, method_name)
         return func(*args)
 
-
 class _BackendNone(_BackendBase):
     def _backend_call(*args, **kwargs):
         pass
-
 
 _backend = _BackendMissing()

@@ -78,12 +78,12 @@ def calc_pulse_energy(wf):
         )
         pulse_energy = wf.get_intensity().sum(axis=0).sum(axis=0).sum(axis=0)
         pulse_energy_J = pulse_energy * dx * dy * 1e6 * dt
-        print(
-            "Number of photons per pulse: {:e}".format(
-                pulse_energy_J * J2eV / wf.params.photonEnergy
-            )
-        )
-        return pulse_energy_J
+        photons_per_pulse = pulse_energy_J * J2eV / wf.params.photonEnergy
+        
+        #print(
+        #    "Number of photons per pulse: {:e}".format(photons_per_pulse)
+        #)
+        return pulse_energy_J, photons_per_pulse
 
 
 def averaged_intensity(wf, bPlot=False):
@@ -208,7 +208,7 @@ def plot_intensity_map(wf, save="", range_x=None, range_y=None, im_aspect="equal
     else:
         t0 = (wf.params.Mesh.sliceMax + wf.params.Mesh.sliceMin) / 2
 
-    # Setup a figure.
+    # Setup a figure.get_intensity_on_axis
     plt.figure(figsize=(10, 10), dpi=100)
     plt.axis("tight")
     # Profile plot.
@@ -504,7 +504,7 @@ def check_sampling(wavefront):
 
     ret = "WAVEFRONT SAMPLING REPORT\n"
     ret += "+----------+---------+---------+---------+---------+---------+---------+---------+\n"
-    ret += "|x/y       |FWHM     |px       |ROI      |R        |Fzone    |px*7     |px*10    |\n"
+    ret += "|x/y       |FWHM     25|px       |ROI      |R        |Fzone    |px*7     |px*10    |\n"
     ret += "+----------+---------+---------+---------+---------+---------+---------+---------+\n"
     ret += (
         "|Horizontal"
@@ -589,6 +589,42 @@ def animate(wfr, qspace=False, logscale=False, delay = 10, outdir = None, fname 
     os.system("convert -delay {} {}/*.png {}.gif".format(delay, outdir, inp_filename) )
     shutil.rmtree(tmp_dir)
 
+def getOnAxisPowerDensity(wfr, spectrum = False):
+    
+    if spectrum:
+        srwl.SetRepresElecField(wfr._srwl_wf, 'f')
+        intensity = wfr.get_intensity()
+    elif spectrum == False:
+        srwl.SetRepresElecField(wfr._srwl_wf, 't')
+        intensity = wfr.get_intensity()
+        
+    mesh = wfr.params.Mesh
+    dx = (mesh.xMax - mesh.xMin)/(mesh.nx - 1)
+    dy = (mesh.yMax - mesh.yMin)/(mesh.ny - 1)
+
+    # Get center pixel numbers.
+    center_nx = int(mesh.nx/2)
+    center_ny = int(mesh.ny/2)
+
+    # Get time slices of intensity.
+    intensity = wfr.get_intensity()
+
+    # Get on-axis intensity.
+    int0_00 = intensity[center_ny, center_nx, :]
+    int0 = intensity.sum(axis=(0,1))*(dx*dy*1.e6) #  amplitude units sqrt(W/mm^2)
+    int0max = int0.max()
+
+    # Get meaningful slices.
+    aw = [a[0] for a in numpy.argwhere(int0 > int0max*0.01)]
+    if aw == []:
+        raise RuntimeError("No significant intensities found.")
+
+    dSlice = (mesh.sliceMax - mesh.sliceMin)/(mesh.nSlices - 1)
+
+    xs = numpy.arange(mesh.nSlices)*dSlice+ mesh.sliceMin
+    xs_mf = numpy.arange(min(aw), max(aw))*dSlice + mesh.sliceMin
+    return xs, int0
+    
 def plotOnAxisPowerDensity(wfr, spectrum=False, outdir = None):
     """ Method to plot the on-axis power density.
     :param spectrum: Whether to plot the power density in energy domain (True) or time domain (False, default).
@@ -630,7 +666,12 @@ def plotOnAxisPowerDensity(wfr, spectrum=False, outdir = None):
     dSlice = (mesh.sliceMax - mesh.sliceMin)/(mesh.nSlices - 1)
 
     xs = numpy.arange(mesh.nSlices)*dSlice+ mesh.sliceMin
-    xs_mf = numpy.arange(min(aw), max(aw))*dSlice + mesh.sliceMin
+
+
+    # Switch back to time domain.
+    srwl.SetRepresElecField(wfr._srwl_wf, 't')
+        
+
 
     # Plot.
     if(wfr.params.wDomain=='time'):

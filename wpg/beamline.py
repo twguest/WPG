@@ -166,6 +166,8 @@ class Beamline(object):
         :param outdir: save directory
         """
         
+        plotIntensity(wfr)
+        
         date = datetime.datetime.now()
         mn,h,d,m,y = date.minute, date.hour, date.day, date.month, date.year
         
