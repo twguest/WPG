@@ -766,3 +766,15 @@ def plotTotalPower(wfr, spectrum=False, outdir = None):
                 mode = 'time'
             plt.savefig(outdir + "/TotalPower{}.png".format(mode))
             
+
+def getCentroid(wfr):
+    [xMin, xMax, yMin, yMax] = wfr.get_limits()
+    x = np.linspace(xMin, xMax, wfr.params.Mesh.nx)
+    y = np.linspace(yMin, yMax, wfr.params.Mesh.ny)
+    
+    ii = wfr.get_intensity()[:,:,0]
+    idx = np.unravel_index(ii.argmax(), ii.shape)
+    
+    centroid = [x[idx[0]], y[idx[1]]]
+    
+    return centroid
