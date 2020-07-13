@@ -767,14 +767,28 @@ def plotTotalPower(wfr, spectrum=False, outdir = None):
             plt.savefig(outdir + "/TotalPower{}.png".format(mode))
             
 
-def getCentroid(wfr):
+def getCentroid(wfr, mode = 'integrated'):
+    
     [xMin, xMax, yMin, yMax] = wfr.get_limits()
     x = np.linspace(xMin, xMax, wfr.params.Mesh.nx)
     y = np.linspace(yMin, yMax, wfr.params.Mesh.ny)
     
-    ii = wfr.get_intensity()[:,:,0]
-    idx = np.unravel_index(ii.argmax(), ii.shape)
     
-    centroid = [x[idx[0]], y[idx[1]]]
+    if mode == 'integrated':
+        ii = wfr.get_intensity().sum(axis = 2)
     
+        idx = np.unravel_index(ii.argmax(), ii.shape)
+    
+        centroid = [x[idx[0]], y[idx[1]], ii[idx[0], idx[1]]]
+    
+    elif mode == 'pulse':
+        ii = wfr.get_intensity()
+        
+        centroid = []
+        
+        for slc in range(ii.shape[2]):
+            islc = ii[:,:,slc]
+            idx = np.unravel_index(islc.argmax(), islc.shape)
+            centroid.append([x[idx[0]], y[idx[1]], islc[idx[0], idx[1]]])
+        
     return centroid
