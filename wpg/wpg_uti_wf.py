@@ -767,7 +767,7 @@ def plotTotalPower(wfr, spectrum=False, outdir = None):
             plt.savefig(outdir + "/TotalPower{}.png".format(mode))
             
 
-def getCentroid(wfr, mode = 'integrated'):
+def getCentroid(wfr, mode = 'integrated', ret = 'centroid'):
     
     [xMin, xMax, yMin, yMax] = wfr.get_limits()
     x = np.linspace(xMin, xMax, wfr.params.Mesh.nx)
@@ -790,5 +790,26 @@ def getCentroid(wfr, mode = 'integrated'):
             islc = ii[:,:,slc]
             idx = np.unravel_index(islc.argmax(), islc.shape)
             centroid.append([x[idx[0]], y[idx[1]], islc[idx[0], idx[1]]])
+    
+    if ret == 'centroid':
+        return centroid
+    elif ret == 'idx':
+        return idx
+    
+    
+    
+    def get_profile_1d(wfr):
+        """
+        return 1d profiles along the center of each transverse axis.
+        """
         
-    return centroid
+        
+        ii = self.get_intensity().sum(axis = -1)
+        
+        idx = getCentroid(wfr, mode = "integrated", ret = "centroid")
+        
+        
+        ix = ii[:, idx[1]]
+        iy = ii[idx[0], :]
+        
+        return ix, iy

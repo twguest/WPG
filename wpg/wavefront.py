@@ -450,20 +450,10 @@ class Wavefront(object):
                 Etmp = (self.data.arrEver[:,:,slc,0].astype('complex128')+(self.data.arrEver[:,:,slc,1]*1j)).reshape((*self.data.arrEver.shape[0:2], 1))
                 Ever = np.concatenate((Ever, Etmp), axis = 2)
                 
-        Ehor.imag, Ever.imag = np.angle(Ehor), np.angle(Ever)
+        Ehor.imag, Ever.imag = np.imag(Ehor), np.imag(Ever)
         
         return np.array([Ehor, Ever])
     
-    def get_profile_1d(self):
-        """
-        return 1d profiles along the center of each transverse axis.
-        """
-        
-        ii = self.get_intensity().sum(axis = -1)
-        shape = ii.shape
-        ix = ii[:, shape[1]//2]
-        iy = ii[shape[0]//2, :]
-        
-        return ix, iy
+
     
     
