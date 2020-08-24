@@ -452,7 +452,7 @@ class Wavefront(object):
                 
         Ehor.imag, Ever.imag = np.imag(Ehor), np.imag(Ever)
         
-        return np.array([Ehor, Ever])
+        return np.array([Ehor, Ever])[0:,:,:]### PRETTY SURE THIS JUST RETURNS Ehor
     
 
     

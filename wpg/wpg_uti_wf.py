@@ -666,7 +666,7 @@ def plotOnAxisPowerDensity(wfr, spectrum=False, outdir = None):
     dSlice = (mesh.sliceMax - mesh.sliceMin)/(mesh.nSlices - 1)
 
     xs = numpy.arange(mesh.nSlices)*dSlice+ mesh.sliceMin
-
+    xs_mf = numpy.arange(min(aw), max(aw))*dSlice + mesh.sliceMin
 
     # Switch back to time domain.
     srwl.SetRepresElecField(wfr._srwl_wf, 't')
@@ -778,7 +778,7 @@ def getCentroid(wfr, mode = 'integrated', ret = 'centroid'):
         ii = wfr.get_intensity().sum(axis = 2)
     
         idx = np.unravel_index(ii.argmax(), ii.shape)
-    
+        
         centroid = [x[idx[0]], y[idx[1]], ii[idx[0], idx[1]]]
     
     elif mode == 'pulse':
@@ -792,24 +792,47 @@ def getCentroid(wfr, mode = 'integrated', ret = 'centroid'):
             centroid.append([x[idx[0]], y[idx[1]], islc[idx[0], idx[1]]])
     
     if ret == 'centroid':
+        
         return centroid
     elif ret == 'idx':
         return idx
     
     
+
+def get_profile_1d(self, wfr):
+    """
+    return 1d profiles along the center of each transverse axis.
+    """
     
-    def get_profile_1d(wfr):
-        """
-        return 1d profiles along the center of each transverse axis.
-        """
+    
+    ii = self.get_intensity().sum(axis = -1)
+    
+    idx = getCentroid(wfr, mode = "integrated", ret = "centroid")
+    
+    
+    ix = ii[:, idx[1]]
+    iy = ii[idx[0], :]
+    
+    return ix, iy
+
+
+def getAxis(wfr, axis = 'x'):
+    
+    
+    
+    if axis == 'x':
+        axis = np.linspace(wfr.params.Mesh.xMin, wfr.params.Mesh.xMax,
+                           wfr.params.Mesh.nx)
+    elif axis == 'y':
+        axis = np.linspace(wfr.params.Mesh.yMin, wfr.params.Mesh.yMax,
+                   wfr.params.Mesh.ny)
         
-        
-        ii = self.get_intensity().sum(axis = -1)
-        
-        idx = getCentroid(wfr, mode = "integrated", ret = "centroid")
-        
-        
-        ix = ii[:, idx[1]]
-        iy = ii[idx[0], :]
-        
-        return ix, iy
+    elif axis == 't':
+        if wfr.params.wDomain != 'time':
+            srwl.SetRepresElecField(wfr._srwl_wf, 't')
+        axis = np.linspace(wfr.params.Mesh.sliceMin, wfr.params.Mesh.sliceMax,
+           wfr.params.Mesh.nSlices)
+        if wfr.params.wDomain != 'frequency':
+            srwl.SetRepresElecField(wfr._srwl_wf, 't')
+    
+    return axis
