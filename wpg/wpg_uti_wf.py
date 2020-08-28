@@ -767,37 +767,55 @@ def plotTotalPower(wfr, spectrum=False, outdir = None):
             plt.savefig(outdir + "/TotalPower{}.png".format(mode))
             
 
-def getCentroid(wfr, mode = 'integrated', ret = 'centroid'):
+def getCentroid(wfr, mode = 'integrated', idx = False):
     
-    [xMin, xMax, yMin, yMax] = wfr.get_limits()
-    x = np.linspace(xMin, xMax, wfr.params.Mesh.nx)
-    y = np.linspace(yMin, yMax, wfr.params.Mesh.ny)
     
+    x = getAxis(wfr, axis = 'x')
+    y = getAxis(wfr, axis = 'y')
+    t = getAxis(wfr, axis = 't')
+    
+    
+
+    dx = x[1]-x[0]
+    dy = y[1]-y[0]
+    dt = t[1]-t[0]
     
     if mode == 'integrated':
-        ii = wfr.get_intensity().sum(axis = 2)
-    
+        
+        ii = wfr.get_intensity().sum(axis = -1)
         idx = np.unravel_index(ii.argmax(), ii.shape)
         
-        centroid = [x[idx[0]], y[idx[1]], ii[idx[0], idx[1]]]
-    
+        centroid = np.zeros([1,2])
+        
+        if idx == True:
+            centroid = idx
+        else:
+            centroid[:,0] = x[idx[1]]
+            centroid[:,1] = y[idx[0]]
+           
     elif mode == 'pulse':
+        
         ii = wfr.get_intensity()
         
-        centroid = []
-        
-        for slc in range(ii.shape[2]):
+        if idx == True:
+            centroid = np.zeros([ii.shape[-1], 2])
+        else:
+            centroid = np.zeros([ii.shape[-1], 4])
+        for slc in range(ii.shape[-1]):
             islc = ii[:,:,slc]
             idx = np.unravel_index(islc.argmax(), islc.shape)
-            centroid.append([x[idx[0]], y[idx[1]], islc[idx[0], idx[1]]])
-    
-    if ret == 'centroid':
-        
-        return centroid
-    elif ret == 'idx':
-        return idx
-    
-    
+            
+            if idx == True:
+                centroid[slc,0] = idx[1]
+                centroid[slc,1] = idx[0]
+
+            else:
+                centroid[slc,0] = x[idx[1]]
+                centroid[slc,1] = y[idx[0]]
+                centroid[slc,2] = t[slc]
+                centroid[slc,3] = islc.sum() * dx * dy * 1e6 * dt
+                
+    return centroid
 
 def get_profile_1d(self, wfr):
     """
