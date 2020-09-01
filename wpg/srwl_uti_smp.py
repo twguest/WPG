@@ -9,8 +9,8 @@
 import math
 import os
 
-import srwlib
-import uti_io
+import wpg.srwlib
+import wpg.uti_io as uti_io
 
 
 # ********************** The class for Samples:
@@ -306,7 +306,8 @@ class SRWLUtiSmp:
 # ********************** Create transmission element from the data from an image file:
 def srwl_opt_setup_transm_from_file(
     file_path,
-    resolution,
+    rx,
+    ry,
     thickness,
     delta,
     atten_len,
@@ -365,7 +366,7 @@ def srwl_opt_setup_transm_from_file(
 
     input_parms = {
         "type": "sample",
-        "resolution": resolution,
+        "resolution": (rx,ry),
         "thickness": thickness,
         "refractiveIndex": delta,
         "attenuationLength": atten_len,
@@ -405,8 +406,8 @@ def srwl_opt_setup_transm_from_file(
     # Input parameters to SRWLOptT:
     nx = s.nx
     ny = s.ny
-    rx = nx * resolution
-    ry = ny * resolution
+    rx = nx * rx
+    ry = ny * ry
 
     # opT = srwlib.SRWLOptT(_nx=nx, _ny=ny, _rx=rx, _ry=ry,
     #                      _arTr=arTr, _extTr=extTr, _Fx=fx, _Fy=fy,
