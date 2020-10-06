@@ -9,6 +9,14 @@ Created on Tue Oct  6 12:38:30 2020
 
 from distutils.core import setup
 
+class MyInstall(DistutilsInstall):
+    def run(self):
+        
+        system("make all")
+        DistutilsInstall.run(self)
+
+        
+
 setup(
     name='WPG',
     version='0.1.0',
