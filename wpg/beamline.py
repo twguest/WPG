@@ -168,21 +168,15 @@ class Beamline(object):
         
         plotIntensity(wfr)
         
-        date = datetime.datetime.now()
-        mn,h,d,m,y = date.minute, date.hour, date.day, date.month, date.year
-        
-        enstr = str(wfr.params.photonEnergy/1000).replace(".","-")
-       
-        if outdir is not None:
-            if os.path.exists(outdir):
-                os.mkdir(outdir + "/run_{}-{}-{}_{}-{}_{}keV/".format(d,m,y,h,mn,enstr))
-                outdir = outdir + "/run_{}-{}-{}_{}-{}_{}keV/".format(d,m,y,h,mn,enstr)
-            elif os.path.exists(outdir) == False: 
-                print("Cannot Find Output Directory, Not Saving")
-                outdir = None
-        
         print(outdir)
+        if outdir is not None:
+            
+            if os.path.exists(outdir) == False: 
+                assert(ValueError, "Output Directory Could Not Be Found")
+            else: 
+                pass
         
+
         if outdir is not None:
             wfr.write(outdir + "initialSource")
             plotIntensity(wfr, save = outdir + "source")
@@ -208,10 +202,6 @@ class Beamline(object):
 
             elif outdir is None:
                 plotIntensity(wfr)
-            
-        wfr.write(outdir + "finalSource")
-        wfr.save_tif(outdir + "finalSource")
-            
 
 def _check_srw_pp(pp):
     """
