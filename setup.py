@@ -11,7 +11,7 @@ from distutils.core import setup
 
 setup(
     name='WPG',
-    version='0.1dev',
+    version='0.1.0',
     packages=['wpg', 'wpg.*',],
     license='MIT',
     long_description=open('README.md').read(),
