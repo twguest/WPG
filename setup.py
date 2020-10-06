@@ -12,7 +12,7 @@ from distutils.core import setup
 setup(
     name='WPG',
     version='0.1.0',
-    packages=['wpg', 'wpg.*',],
+    packages=['wpg'],
     license='MIT',
     long_description=open('README.md').read(),
 )
