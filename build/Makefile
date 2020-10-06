@@ -37,9 +37,11 @@ srw:
 	
 	patch $(TMP_DIR)/SRW/cpp/py/Makefile py3.patch
 	cd $(TMP_DIR)/SRW; MODE=$(OPENMP_MODE) make all;
+	pwd	
 	mkdir -p $(BUILD_DIR)/lib
 	cp $(TMP_DIR)/SRW/cpp/gcc/srwlpy*.so $(BUILD_DIR)/lib/
 	cp $(TMP_DIR)/SRW/cpp/gcc/srwlpy*.so $(TMP_DIR)/SRW/env/work/srw_python
 	cd ../../
+	pwd
 	cp $(BUILD_DIR)/lib/srwlpy*.so /wpg/  
 	

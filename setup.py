@@ -16,9 +16,9 @@ from distutils.core import setup
 class MyInstall(DistutilsInstall):
     def run(self):
         
-        
-        DistutilsInstall.run(self)
         system("make all")
+        DistutilsInstall.run(self)
+        
         
 
 setup(
