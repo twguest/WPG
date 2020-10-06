@@ -6,7 +6,11 @@ Created on Tue Oct  6 12:38:30 2020
 @author: twguest
 """
 
+from setuptools import Extension
+from distutils.core import setup, Extension
 
+from distutils.command.install import install as DistutilsInstall
+from os import system
 from distutils.core import setup
 
 class MyInstall(DistutilsInstall):
