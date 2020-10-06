@@ -26,6 +26,6 @@ setup(
     version='0.1.0',
     packages=['wpg'],
     license='MIT',
-    long_description=open('README.md').read()
-    cmdclass={'install': MyInstall},
+    long_description=open('README.md').read(),
+    cmdclass={'install': MyInstall}
 )
