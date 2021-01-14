@@ -43,5 +43,5 @@ srw:
 	cp $(TMP_DIR)/SRW/cpp/gcc/srwlpy*.so $(TMP_DIR)/SRW/env/work/srw_python
 	cd ../../
 	pwd
-	cp $(BUILD_DIR)/lib/srwlpy*.so /wpg/  
+	cp $(BUILD_DIR)/lib/srwlpy*.so wpg/  
 	

@@ -26,7 +26,7 @@ import wpg.glossary as glossary
 
 from wpg.utils import srw_obj2str
 
-
+from matplotlib import pyplot as plt
 import imageio
 
 
@@ -452,8 +452,25 @@ class Wavefront(object):
                 
         Ehor.imag, Ever.imag = np.imag(Ehor), np.imag(Ever)
         
-        return np.array([Ehor, Ever])[0:,:,:]### PRETTY SURE THIS JUST RETURNS Ehor
+        return np.array([Ehor, Ever])[0,:,:,:]### PRETTY SURE THIS JUST RETURNS Ehor
     
-
-    
-    
+    def view(self):
+        
+        """
+        a simple method for viewing the intensity and phase of a wavefront
+        if a deeper analysis is required. try wpg.wpg_uti_wf.plot_intensity_map()
+        """
+        fig, axs = plt.subplots(1,2)
+        [ax1, ax2] = axs
+        
+        ax1.imshow(self.get_intensity().sum(axis = -1), cmap = 'bone')
+        ax1.set_title("Mean Intensity")
+        ax1.set_xticks([])
+        ax1.set_yticks([])
+        ax2.set_xticks([])
+        ax2.set_yticks([])
+        ax2.imshow(self.get_phase().sum(axis = -1), cmap = 'hsv')
+        ax2.set_title("Mean Phase")
+        plt.show()
+        
+        
