@@ -158,7 +158,7 @@ class Beamline(object):
             else:
                 raise ValueError("Unknown type of propagators")
                 
-    def propagateSeq(self, wfr, outdir = None):
+    def propagate_sequential(self, wfr, outdir = None):
         """
         Propagate sequentially through each optical element in beamline.
 
