@@ -15,7 +15,7 @@ from __future__ import unicode_literals
 
 import array
 import warnings
-
+import srwlpy
 import numpy as np
 import h5py
 
