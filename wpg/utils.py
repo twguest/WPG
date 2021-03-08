@@ -49,21 +49,37 @@ def store_dict_hdf5(hdf5_file_name, input_dict):
             if name in group:
                 del group[name]
             try:
-                if isinstance(value, numpy.ndarray):
-                    if numpy.allclose(value, 0):
-                        group.create_dataset(
-                            name,
-                            data=value,
-                            chunks=True,
-                            compression="gzip",
-                            compression_opts=1,
-                        )  # compression='lzf'
-                    else:
-                        if all([isinstance(a, numpy.bytes_) for a in value]):
-                            value = numpy.array([a.decode("utf-8") for a in value])
-                        group.create_dataset(name, data=value)
-                elif isinstance(value, str):
-                    group.create_dataset(name, data=numpy.array(value.encode("utf-8")))
+                if isinstance(name, bytes):
+                    name = name.decode()
+                if isinstance(value, str):
+                    group[name] = value
+                elif isinstance(value, numpy.ndarray):
+                    group.create_dataset(name, data=value, chunks=True,
+                            compression='gzip', compression_opts=1)    # compression='lzf'
+                elif isinstance(value, (list, tuple)):
+                    # Convert to numpy array.
+                    value = numpy.array(value)
+
+                    # Handle unicode as hdf does not like unicode arrays.
+                    if value.dtype == numpy.dtype('<U31'):
+                        value = [v.encode('utf8') for v in value]
+
+                    # Create the dataset.
+                    group.create_dataset(name,
+                                         data=value,
+                                         chunks=True,
+                                         compression='gzip',
+                                         compression_opts=1,
+                                         )    # compression='lzf'
+#                     if numpy.allclose(value, 0):
+#                         group.create_dataset(name, data=value, chunks=True,
+#                             compression='gzip', compression_opts=1)    # compression='lzf'
+#                     else:
+#                         if all([isinstance(a, numpy.bytes_) for a in value]):
+#                             value = numpy.array([a.decode('utf-8') for a in value])
+#                         group.create_dataset(name, data=value)
+#                 elif isinstance(value, str):
+#                         group.create_dataset(name, data=numpy.array(value.encode('utf-8')))
 
                 elif isinstance(value, list):
                     if all([isinstance(a, str) for a in value]):

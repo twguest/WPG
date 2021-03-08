@@ -19,15 +19,20 @@ import warnings
 import numpy as np
 import h5py
 
-import wpg.srwlib as srwlib
+from wpg import srwlib
 
-import wpg.utils as utils
-import wpg.glossary as glossary
+from wpg import utils
+from wpg import glossary
 
 from wpg.utils import srw_obj2str
 
 from matplotlib import pyplot as plt
 import imageio
+import scipy.constants
+from scipy.constants import c
+from wpg.wpg_uti_wf import calculate_fwhm
+
+h = scipy.constants.physical_constants['Planck constant in eV s'][0]
 
 
 class Wavefront(object):
@@ -472,5 +477,37 @@ class Wavefront(object):
         ax2.imshow(self.get_phase().sum(axis = -1), cmap = 'hsv')
         ax2.set_title("Mean Phase")
         plt.show()
+
+
+    def get_wavelength(self):
+        return (h*c)/(self.params.photonEnergy)
+
+
+    def set_electric_field_representation(self, domain):
+        """
+        wrapper for srwlpy.SetRepresElecField
         
+        sets the electric field representation
         
+        :param domain: choice ofangular - 'a', frequency 'f' or time 't' [str]
+        """
+        srwlpy.SetRepresElecField(self._srwl_wf, domain)
+
+
+    def get_divergence(self):
+        """
+        calculate the full-angle divergence of the beam
+        
+        :param wfr: WPG wavefront structure
+        """
+        
+        wDomain = self.params.wDomain
+        self.set_electric_field_representation('a') 
+        
+        sig_x, sig_y = calculate_fwhm(self)['fwhm_x'], calculate_fwhm(self)['fwhm_y']
+        
+        self.set_electric_field_representation(wDomain) 
+
+        return sig_x, sig_y
+
+ 

@@ -8,6 +8,9 @@ from wpg.generators import build_gauss_wavefront_xy
 from copy import copy, deepcopy
 from operator import itemgetter
 
+
+### worth adapting some of these functions
+
 def addSlice(wfr, tmp_wfr):
     
     """
@@ -178,7 +181,7 @@ class gsmSource():
         returns set of eigenvalue normalised to 1
         
         under the assumption that the transverse components of the MCF are seperable
-        definitions follow Starikov and Wolf, 1982:
+        definitions follow Starikov and Wolf, 1982:Merges from masterMerges from master
             
         beta =  p_mu/p_I is a measure of the "degree of global coherence" of the source.
        

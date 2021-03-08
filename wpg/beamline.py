@@ -42,7 +42,7 @@ class Beamline(object):
                 try:
                     elem = srwl_beamline.arOpt[ti]
                 except IndexError:
-                    elem = wpg.optical_elements.Empty()
+                    elem = optical_elements.Empty()
 
                 try:
                     pp = srwl_beamline.arProp[ti]
@@ -65,7 +65,7 @@ class Beamline(object):
                 try:
                     elem = po["optical_elements"][ti]
                 except IndexError:
-                    elem = wpg.optical_elements.Empty()
+                    elem = optical_elements.Empty()
 
                 try:
                     pp = po["propagation_parameters"][ti]

@@ -8,10 +8,10 @@ from __future__ import print_function
 __author__ = "A. Buzmakov"
 
 import warnings
-from wpg import srwlib
+from . import srwlib
 
 try:
-    from wpg import srwlpy
+    from . import srwlpy
 except ImportError:
     import srwlpy  #  Hack for read the docs
 

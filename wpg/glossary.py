@@ -15,7 +15,7 @@ from __future__ import unicode_literals
 
 import inspect
 import sys
-import wpg.utils as utils
+from . import utils
 import warnings
 import numpy as np
 import array

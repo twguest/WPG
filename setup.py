@@ -16,16 +16,19 @@ from distutils.core import setup
 class MyInstall(DistutilsInstall):
     def run(self):
         
-        system("make all")
-        DistutilsInstall.run(self)
         
+        DistutilsInstall.run(self)
+        system("make all")
         
 
 setup(
+    version='2019.12',
     name='WPG',
     version='0.1.0',
     packages=['wpg', 'wpg.srw'],
     license='MIT',
     long_description=open('README.md').read(),
     cmdclass={'install': MyInstall}
+)
+
 )

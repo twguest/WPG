@@ -53,6 +53,10 @@ def _test_notebook(path):
     assert errors == []
 
 
+def test_beamline_s1_simple():
+    _test_notebook(
+            os.path.join('samples', 'beamlines', 'S1_SPB_CRL_simplified', 'S1_SPB_CRL_simplified.ipynb'))
+
 def test_tutoral_intro():
     _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_intro.ipynb"))
 
@@ -74,4 +78,5 @@ def test_tutoral_3():
 
 
 def test_tutoral_3_new():
-    _test_notebook(os.path.join("samples", "Tutorials", "Tutorial_case_3_new.ipynb"))
+    _test_notebook(
+        os.path.join('samples', 'Tutorials', 'Tutorial_case_3_new.ipynb'))

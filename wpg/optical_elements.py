@@ -13,12 +13,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import os
-import errno
-from wpg.srwlib import SRWLOptD as Drift
-from wpg.srwlib import SRWLOptL as Lens
-from wpg.srwlib import srwl, srwl_opt_setup_CRL
-import wpg.srwlib
+from .srwlib import SRWLOptD as Drift
+from .srwlib import SRWLOptL as Lens
+from .srwlib import srwl
+from . import srwlib
 import numpy as np
 
 import sys

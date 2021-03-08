@@ -106,7 +106,23 @@ build/tmp
 samples/Tutorials/*.test.ipynb
 samples/Tutorials/*.test.html
 samples/Tutorials/Tutorial_case_1/*.eps
-*.npy
 
-##
-/run/
+# SRW stuff
+wpg/srw/__srwl_logs__/
+wpg/srw/data_example_01
+
+wpg/.spyproject/config/codestyle.ini
+
+wpg/.spyproject/config/defaults/defaults-codestyle-0.2.0.ini
+
+wpg/.spyproject/config/defaults/defaults-encoding-0.2.0.ini
+
+wpg/.spyproject/config/defaults/defaults-vcs-0.2.0.ini
+
+wpg/.spyproject/config/defaults/defaults-workspace-0.2.0.ini
+
+wpg/.spyproject/config/encoding.ini
+
+wpg/.spyproject/config/vcs.ini
+
+wpg/.spyproject/config/workspace.ini

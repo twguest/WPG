@@ -6,7 +6,7 @@ FELPY
 
 __author__ = "Trey Guest"
 __credits__ = ["Trey Guest"]
-__license__ = "Apache"
+__license__ = "EuXFEL"
 __version__ = "1.0.0"
 __maintainer__ = "Trey Guest"
 __email__ = "twguest@students.latrobe.edu.au"
@@ -29,7 +29,6 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from wpg.srwlib import srwl
-from wpg.wavefront import Wavefront
 
 __author__ = "A. Buzmakov, L. Samoylova, C. Fortmann-Grote"
 
@@ -603,7 +602,7 @@ def animate(wfr, qspace=False, logscale=False, delay = 10, outdir = None, fname 
     os.system("convert -delay {} {}/*.png {}.gif".format(delay, outdir, inp_filename) )
     shutil.rmtree(tmp_dir)
 
-def getOnAxisPowerDensity(wfr, spectrum = False):
+def get_axial_power_density(wfr, spectrum = False):
     
     if spectrum:
         srwl.SetRepresElecField(wfr._srwl_wf, 'f')
@@ -639,7 +638,7 @@ def getOnAxisPowerDensity(wfr, spectrum = False):
     xs_mf = numpy.arange(min(aw), max(aw))*dSlice + mesh.sliceMin
     return xs, int0
     
-def plotOnAxisPowerDensity(wfr, spectrum=False, outdir = None):
+def plot_axial_power_density(wfr, spectrum=False, outdir = None):
     """ Method to plot the on-axis power density.
     :param spectrum: Whether to plot the power density in energy domain (True) or time domain (False, default).
     :type spectrum: bool
@@ -713,7 +712,7 @@ def plotOnAxisPowerDensity(wfr, spectrum=False, outdir = None):
         plt.savefig(outdir + "/OnAxisPowerDensity_{}.png".format(mode))
         
 
-def plotTotalPower(wfr, spectrum=False, outdir = None):
+def plot_total_power(wfr, spectrum=False, outdir = None):
     """ Method to plot the total power.
     :param spectrum: Whether to plot the power density in energy domain (True) or time domain (False, default).
     :type spectrum: bool
@@ -781,12 +780,12 @@ def plotTotalPower(wfr, spectrum=False, outdir = None):
             plt.savefig(outdir + "/TotalPower{}.png".format(mode))
             
 
-def getCentroid(wfr, mode = 'integrated', idx = False):
+def get_centroid(wfr, mode = 'integrated', idx = False):
     
     
-    x = getAxis(wfr, axis = 'x')
-    y = getAxis(wfr, axis = 'y')
-    t = getAxis(wfr, axis = 't')
+    x = get_axis(wfr, axis = 'x')
+    y = get_axis(wfr, axis = 'y')
+    t = get_axis(wfr, axis = 't')
     
     
 
@@ -839,7 +838,7 @@ def get_profile_1d(self, wfr):
     
     ii = self.get_intensity().sum(axis = -1)
     
-    idx = getCentroid(wfr, mode = "integrated", ret = "centroid")
+    idx = get_centroid(wfr, mode = "integrated", ret = "centroid")
     
     
     ix = ii[:, idx[1]]
@@ -848,7 +847,7 @@ def get_profile_1d(self, wfr):
     return ix, iy
 
 
-def getAxis(wfr, axis = 'x'):
+def get_axis(wfr, axis = 'x'):
     
     
     
