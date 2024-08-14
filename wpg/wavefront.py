@@ -680,7 +680,7 @@ class Wavefront(object):
       
     @property
     def wavelength(self):
-        """
+        r"""
         Calculate and return the wavelength based on photon energy.
         
         This property calculates the wavelength using the relationship:
