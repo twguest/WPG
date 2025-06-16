@@ -1127,7 +1127,7 @@ class WFDataArrEhor(RadiationField):
         Horizontal polarization
         """
 
-        res = np.array(self._wf._srwl_wf.arEx, dtype='float32', copy=False)
+        res = np.asarray(self._wf._srwl_wf.arEx, dtype='float32')
         
         correct_shape = (self._wf.params.Mesh.ny,
                          self._wf.params.Mesh.nx,
@@ -1203,7 +1203,7 @@ class WFDataArrEver(RadiationField):
         Vertical polarization
         """
 
-        res = np.array(self._wf._srwl_wf.arEy, dtype='float32', copy=False)
+        res = np.asarray(self._wf._srwl_wf.arEy, dtype='float32')
         correct_shape = (self._wf.params.Mesh.ny,
                          self._wf.params.Mesh.nx,
                          self._wf.params.Mesh.nSlices,
